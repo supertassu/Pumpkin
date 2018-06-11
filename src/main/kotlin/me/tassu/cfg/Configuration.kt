@@ -6,6 +6,8 @@ import me.tassu.util.containsMethod
 import me.tassu.util.doesNotThrow
 import me.tassu.util.replaceColors
 import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -93,12 +95,12 @@ open class Configuration(private val config: Config) {
 
     fun isMaterial(id: String): Boolean {
         return {
-            Material.valueOf(getString(id))
+            Material.valueOf(getString(id, color = true))
         }.doesNotThrow(CONFIG_EXCEPTION, IllegalArgumentException::class.java)
     }
 
     fun getMaterial(id: String): Material {
-        return Material.valueOf(getString(id))
+        return Material.valueOf(getString(id, color = false))
     }
 
     // ADVANCED OBJECTS
@@ -139,6 +141,35 @@ open class Configuration(private val config: Config) {
             item.durability = itemCfg.getInt("data").toShort()
         }
 
+        val meta = item.itemMeta
+
+        if (itemCfg.contains("name")) {
+            meta.displayName = itemCfg.getString("name")
+        } else if (itemCfg.contains("i18n")) {
+            meta.localizedName = itemCfg.getString("i18n")
+        }
+
+        if (itemCfg.contains("lore")) {
+            meta.lore = itemCfg.getStringList("lore")
+        }
+
+        if (itemCfg.contains("flags")) {
+            itemCfg.getStringList("flags").stream()
+                    .map { ItemFlag.valueOf(it) }
+                    .forEach { meta.addItemFlags(it) }
+        }
+
+        if (itemCfg.contains("enchantments")) {
+            itemCfg.getStringList("enchantments").stream()
+                    .map {
+                        val split = it.split(" ")
+                        Pair(split[0], if (split.size == 1) 1 else split[1].toInt())
+                    }
+                    .map({ string: String, int: Int -> Pair(string, int) })
+                    .forEach { meta.addItemFlags(it) }
+        }
+
+        item.itemMeta = meta
         return item
     }
 
