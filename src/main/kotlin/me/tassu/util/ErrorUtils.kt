@@ -1,18 +1,19 @@
 package me.tassu.util
 
 @JvmName("throws")
-fun (() -> Any).throws(target: Class<out Throwable>? = null): Boolean {
+fun (() -> Any).throws(vararg target: Class<out Throwable>): Boolean {
     try {
         this()
     } catch (e: Throwable) {
-        if (target == null) return true
-        return e.javaClass.isAssignableFrom(target)
+        val ex = e::class.java
+        if (target.isEmpty()) return true
+        return target.stream().anyMatch { ex.isAssignableFrom(it) }
     }
 
     return false
 }
 
 @JvmName("doesNotThrow")
-fun (() -> Any).doesNotThrow(target: Class<out Throwable>? = null): Boolean {
-    return !this.throws(target)
+fun (() -> Any).doesNotThrow(vararg target: Class<out Throwable>): Boolean {
+    return !this.throws(*target)
 }

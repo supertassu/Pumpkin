@@ -2,40 +2,32 @@ package me.tassu.cfg
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigException
-import com.typesafe.config.ConfigFactory
+import me.tassu.util.containsMethod
 import me.tassu.util.doesNotThrow
-import me.tassu.util.readAsString
 import me.tassu.util.replaceColors
-import org.bukkit.plugin.Plugin
-import java.io.File
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 
-class Configuration(private val plugin: Plugin, private val name: String) {
-
-    private val folder: File get() = plugin.dataFolder
-    private val file = File(folder, "$name.conf")
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    @get:JvmName("getAsTypeSafeConfig")
-    val config: Config
-
-    init {
-        if (!folder.exists()) {
-            folder.mkdir()
-        }
-
-        if (!file.exists()) {
-            plugin.saveResource("$name.conf", false)
-        }
-
-        config = ConfigFactory.parseFile(file).withFallback(
-                ConfigFactory.parseString(plugin.getResource("$name.conf").readAsString()))
-    }
+@Suppress("MemberVisibilityCanBePrivate")
+open class Configuration(private val config: Config) {
 
     companion object {
-        private val WRONG_TYPE_EXCEPTION: Class<out Throwable> = ConfigException.WrongType::class.java
-
+        private val CONFIG_EXCEPTION: Class<out Throwable> = ConfigException::class.java
     }
+
     /// ===== MEMBER FUNCTIONS =====
+
+    // list keys
+
+    fun getKeys(path: String = ""): Iterable<String> {
+        var config = this.config
+
+        if (path.isNotBlank()) {
+            config = this.config.getConfig(path)
+        }
+
+        return config.entrySet().map { it.key }.toSet()
+    }
 
     // contains
 
@@ -48,7 +40,7 @@ class Configuration(private val plugin: Plugin, private val name: String) {
     fun isString(id: String): Boolean {
         return {
             config.getString(id)
-        }.doesNotThrow(WRONG_TYPE_EXCEPTION)
+        }.doesNotThrow(CONFIG_EXCEPTION)
     }
 
     fun getString(id: String, color: Boolean = true): String {
@@ -62,7 +54,7 @@ class Configuration(private val plugin: Plugin, private val name: String) {
     fun isStringList(id: String): Boolean {
         return {
             config.getString(id)
-        }.doesNotThrow(WRONG_TYPE_EXCEPTION)
+        }.doesNotThrow(CONFIG_EXCEPTION)
     }
 
     fun getStringList(id: String, color: Boolean = true): List<String> {
@@ -76,11 +68,78 @@ class Configuration(private val plugin: Plugin, private val name: String) {
     fun isInt(id: String): Boolean {
         return {
             config.getInt(id)
-        }.doesNotThrow(WRONG_TYPE_EXCEPTION)
+        }.doesNotThrow(CONFIG_EXCEPTION)
     }
 
     fun getInt(id: String): Int {
         return config.getInt(id)
+    }
+
+    // booleans
+
+    fun isBoolean(id: String): Boolean {
+        return {
+            config.getBoolean(id)
+        }.doesNotThrow(CONFIG_EXCEPTION)
+    }
+
+    fun getBoolean(id: String): Boolean {
+        return config.getBoolean(id)
+    }
+
+    // BUKKIT OBJECTS
+
+    // material
+
+    fun isMaterial(id: String): Boolean {
+        return {
+            Material.valueOf(getString(id))
+        }.doesNotThrow(CONFIG_EXCEPTION, IllegalArgumentException::class.java)
+    }
+
+    fun getMaterial(id: String): Material {
+        return Material.valueOf(getString(id))
+    }
+
+    // ADVANCED OBJECTS
+
+    // sections
+
+    fun isSection(id: String): Boolean {
+        return {
+            config.getConfig(id)
+        }.doesNotThrow()
+    }
+
+    fun getConfig(id: String): Configuration {
+        return Configuration(config.getConfig(id))
+    }
+
+    // item stacks
+
+    fun isItemStack(id: String): Boolean {
+        if (!contains(id)) return false
+        if (!isSection(id)) return false
+
+        if (!contains("$id.material")) return false
+        return isMaterial("$id.material")
+    }
+
+    fun getItemStack(id: String): ItemStack {
+        if (!isItemStack(id)) throw IllegalArgumentException("not an itemstack: $id")
+        val itemCfg = getConfig(id)
+
+        val item = ItemStack(itemCfg.getMaterial("material"))
+
+        if (itemCfg.contains("amount")) {
+            item.amount = itemCfg.getInt("amount")
+        }
+
+        if (itemCfg.contains("durability") && item.containsMethod("setDurability")) {
+            item.durability = itemCfg.getInt("data").toShort()
+        }
+
+        return item
     }
 
 }

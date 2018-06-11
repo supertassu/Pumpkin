@@ -1,7 +1,7 @@
 package me.tassu.msg
 
-import me.tassu.Pumpkin
 import me.tassu.cfg.Configuration
+import me.tassu.cfg.FileConfigurationLoader
 import me.tassu.util.PumpkinLog
 
 object MessageManager {
@@ -11,7 +11,7 @@ object MessageManager {
     private val messages: MutableMap<String, Message> = mutableMapOf()
 
     fun init() {
-        config = Configuration(Pumpkin.instance, "messages")
+        config = FileConfigurationLoader.load("messages")
     }
 
     fun register(message: Message): Message {

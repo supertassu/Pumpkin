@@ -17,6 +17,14 @@ class ErrorUtilsTest {
             throw RuntimeException()
         }.throws(RuntimeException::class.java))
 
+        assertTrue({
+            throw IllegalArgumentException()
+        }.throws(IOException::class.java, IllegalArgumentException::class.java))
+
+        assertTrue({
+            throw IllegalArgumentException()
+        }.throws(IllegalArgumentException::class.java, IOException::class.java))
+
         assertFalse({
             throw IllegalAccessError()
         }.throws(IOException::class.java))
