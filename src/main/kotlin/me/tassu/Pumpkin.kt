@@ -1,35 +1,57 @@
 package me.tassu
 
-import co.aikar.commands.BukkitCommandManager
-import me.tassu.cfg.Configuration
-import me.tassu.cfg.FileConfigurationLoader
-import me.tassu.msg.DefaultMessages
-import me.tassu.msg.MessageManager
+import co.aikar.commands.SpongeCommandManager
+import com.google.inject.Inject
+import com.uchuhimo.konf.Config
+import me.tassu.cfg.DefaultConfig
+import me.tassu.cfg.FileManager
+import me.tassu.msg.CommandMessages
+import me.tassu.msg.GeneralMessages
 import me.tassu.util.PumpkinLog
-import org.bukkit.plugin.java.JavaPlugin
+import org.spongepowered.api.Game
+import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent
+import org.spongepowered.api.plugin.Plugin
+import org.spongepowered.api.plugin.PluginContainer
+import java.nio.file.Path
+import org.spongepowered.api.config.ConfigDir
+import org.spongepowered.api.event.game.GameReloadEvent
 
 /**
  * This is the main class of Pumpkin.
  * @author tassu <git@tassu.me>
  */
-class Pumpkin : JavaPlugin() {
+@Plugin(id = "pumpkin", name = "Pumpkin")
+class Pumpkin {
 
     companion object {
-        @get:JvmName("getInstance") val instance: Pumpkin get() {
-            return getPlugin(Pumpkin::class.java)
-        }
-
-        @get:JvmName("getConfiguration") lateinit var configuration: Configuration
         @get:JvmName("logger") val log: PumpkinLog = PumpkinLog
-        @get:JvmName("version") val version: String get() = instance.description.version
         @get:JvmName("debug") var debug: Boolean = true
+        @get:JvmName("version") val version: String get() = Pumpkin::class.java.annotations
+                .filterIsInstance(Plugin::class.java)
+                .first()
+                .version
+
+        @get:JvmName("container") lateinit var container: PluginContainer
+        @get:JvmName("config") lateinit var config: Config
 
         const val DEBUG_RELOAD_CONFIG = "Pumpkin#reloadConfig()"
     }
 
-    private lateinit var cmdManager: BukkitCommandManager
+    @Inject private lateinit var game: Game
+    @Inject private val pluginContainer: PluginContainer? = null
 
-    override fun onEnable() {
+    @Inject
+    private fun setContainer(container: PluginContainer) {
+        Pumpkin.container = container
+    }
+
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    val configDir: Path? = null
+
+    @Listener
+    fun serverStarting(event: GameAboutToStartServerEvent) {
         log.info(" ____  __ __ ___  ___ ____  __ __ __ __  __")
         log.info("  || \\\\ || || ||\\\\//|| || \\\\ || // || ||\\ ||\n")
         log.info("  ||_// || || || \\/ || ||_// ||<<  || ||\\\\||\n")
@@ -43,39 +65,40 @@ class Pumpkin : JavaPlugin() {
         reloadConfig()
     }
 
-    override fun reloadConfig() {
+    @Listener
+    fun reload(event: GameReloadEvent) {
+        reloadConfig()
+    }
+
+
+    private fun reloadConfig() {
         log.info("")
         log.info("Reloading Pumpkin... ")
 
         val startTime = System.currentTimeMillis()
 
-        // Load default configuration
+        // Save config files & load default configuration
+        log.debug("Saving default configuration files", DEBUG_RELOAD_CONFIG)
+        FileManager.handle("pumpkin.conf", "messages.conf", "itemdb.conf")
+
         log.debug("Reloading configuration from disk.", DEBUG_RELOAD_CONFIG)
-        configuration = FileConfigurationLoader.load("pumpkin")
+
+        config = Config {
+            addSpec(DefaultConfig)
+            addSpec(GeneralMessages)
+            addSpec(CommandMessages)
+        }
+                .withSourceFrom.file( FileManager.file("pumpkin.conf") )
+                .withSourceFrom.file( FileManager.file("messages.conf") )
+                .withSourceFrom.file( FileManager.file("itemdb.conf") )
 
         // Update debug state
-        debug = configuration.getBoolean("debug")
+        debug = config[DefaultConfig.debug]
         log.debug("New state for debug is $debug", DEBUG_RELOAD_CONFIG)
 
-        // Load messages from configuration
-        log.debug("Reloading messages.", DEBUG_RELOAD_CONFIG)
-        MessageManager.init()
-        DefaultMessages.reload()
-
-        // Clean up old commands.
-        if (::cmdManager.isInitialized) {
-            log.debug("Un-registering old commands.", DEBUG_RELOAD_CONFIG)
-            val commandStartTime = System.currentTimeMillis()
-
-            cmdManager.unregisterCommands()
-
-            log.debug("Old commands removed in ${System.currentTimeMillis() - commandStartTime} ms.", DEBUG_RELOAD_CONFIG)
-        }
-
         // Register new commands
-        log.debug("Registering new commands.")
+        log.debug("Registering commands.")
 
-        cmdManager = BukkitCommandManager(this)
 
         log.info("Pumpkin was reloaded in ${System.currentTimeMillis() - startTime} ms.")
     }

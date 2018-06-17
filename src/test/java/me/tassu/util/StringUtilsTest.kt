@@ -1,8 +1,5 @@
 package me.tassu.util
 
-import org.bukkit.command.ConsoleCommandSender
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +29,7 @@ class StringUtilsTest {
         assertEquals("null", valueOf(null))
     }
 
-    @Test
+    /*@Test
     fun entityValueOf() {
         val entity = Mockito.mock(Entity::class.java)
         Mockito.`when`(entity.name).thenReturn("hello there")
@@ -61,7 +58,7 @@ class StringUtilsTest {
 
         Mockito.`when`(player.displayName).thenReturn("not name")
         assertEquals("not name", valueOf(player))
-    }
+    }*/
 
     @Test
     fun testConvertToString() {

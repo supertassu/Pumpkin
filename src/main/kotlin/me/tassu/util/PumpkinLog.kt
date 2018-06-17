@@ -1,35 +1,34 @@
 package me.tassu.util
 
 import me.tassu.Pumpkin
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import java.util.logging.Level
+import org.spongepowered.api.Sponge
+import org.spongepowered.api.text.serializer.TextSerializers
 
 object PumpkinLog {
 
-    private val logger = Pumpkin.instance.logger
+    private val logger = Pumpkin.container.logger
     private val debug get() = Pumpkin.debug
 
     fun info(string: String) {
-        Bukkit.getConsoleSender().sendMessage("${Pumpkin.instance.description.prefix ?: Pumpkin.instance.description.name} $string")
+        Sponge.getGame().server.console.sendMessage(TextSerializers.FORMATTING_CODE.deserialize("&6(Pumpkin)&r $string"))
     }
 
     fun debug(string: String, module: String = "") {
         if (!debug) return
 
-        info("${ChatColor.YELLOW}[DEBUG]${if (module.isNotEmpty()) " $module" else ""} ${ChatColor.RESET}$string")
+        info("&e[DEBUG]${if (module.isNotEmpty()) " $module" else ""} &r$string")
     }
 
     fun error(string: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            logger.log(Level.SEVERE, string, throwable)
+            logger.error(string, throwable)
         } else {
-            logger.severe(string)
+            logger.error(string)
         }
     }
 
     fun warn(string: String) {
-        logger.warning(string)
+        logger.warn(string)
     }
 
 }
