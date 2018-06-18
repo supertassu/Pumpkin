@@ -1,46 +1,26 @@
 package me.tassu.cmds
 
-import me.tassu.cmds.args.Arguments
-import org.spongepowered.api.command.CommandResult
+import co.aikar.commands.BaseCommand
+import co.aikar.commands.annotation.*
 import org.spongepowered.api.command.CommandSource
-import org.spongepowered.api.command.args.CommandContext
-import org.spongepowered.api.command.spec.CommandExecutor
-import org.spongepowered.api.plugin.PluginContainer
-import org.spongepowered.api.command.args.GenericArguments.plugin
-import org.spongepowered.api.Sponge
-import org.spongepowered.api.command.args.GenericArguments
-import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
-import org.spongepowered.api.entity.living.player.gamemode.GameModes
-import org.spongepowered.api.text.Text
 
+@CommandAlias("gamemode|gm")
+@CommandPermission("pumpkin.command.gamemode.execute")
+object GamemodeCommand : BaseCommand() {
 
-object GamemodeCommand : CommandExecutor {
-
-    fun init(plugin: PluginContainer) {
-        val spec = CommandSpec.builder()
-                .description(Text.of("Change a player's game mode"))
-                .arguments(
-                        Arguments.GameModeArgument(Text.of("mode")),
-                        GenericArguments.playerOrSource(Text.of("target"))
-                )
-                .permission("pumpkin.command.gamemopde.execute")
-                .executor(this)
-                .build()
-
-        Sponge.getCommandManager().register(plugin, spec, "gamemode", "gm", "gmode", "gamem")
-
+    @HelpCommand
+    fun default(@Suppress("UNUSED_PARAMETER")
+                sender: CommandSource) {
+        TODO("send help message")
     }
 
-    override fun execute(src: CommandSource?, args: CommandContext?): CommandResult {
-        val target = args!!.getOne<Player>("target").get()
-        val mode = args.getOne<GameMode>("mode").get()
-
-        if (mode == GameModes.NOT_SET) {
-            return CommandResult.empty()
-        }
-
-        return CommandResult.success()
+    @CommandCompletion("@gamemode @players")
+    @Description("Lists all of your or another players residences.")
+    fun set(@Suppress("UNUSED_PARAMETER") player: CommandSource,
+            mode: GameMode, @Flags("defaultself") target: Player) {
+        target.gameMode().set(mode)
     }
+
 }

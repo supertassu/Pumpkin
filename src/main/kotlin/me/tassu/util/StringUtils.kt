@@ -1,39 +1,40 @@
 package me.tassu.util
 
 import com.google.common.io.CharStreams
-import org.bukkit.ChatColor
-import org.bukkit.command.CommandSender
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
+import me.tassu.Pumpkin
+import org.spongepowered.api.command.CommandSource
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.text.Text
 import java.io.InputStream
 
 @JvmName("processColors")
-fun String.replaceColors(): String {
-    return ChatColor.translateAlternateColorCodes('&', this)
+fun String.replaceColors(): Text {
+    return Pumpkin.textSerializer.deserialize(this)
+}
+
+@JvmName("text")
+fun String.text(): Text {
+    return Text.of(this)
+}
+
+@JvmName("asString")
+fun Text.string(): String {
+    return Pumpkin.textSerializer.serialize(this)
 }
 
 @JvmName("valueOf")
 fun valueOf(any: Any?): String {
     if (any == null) return "null"
-    if (any is CommandSender) {
-        if (any is Entity && any !is Player) {
-            return if (any.isCustomNameVisible) {
-                any.customName
-            } else {
-                any.name
-            }
-        }
-
-        if (any !is Player) {
-            return any.name
-        }
-
-        return if (any.displayName == null) {
-            any.name
-        } else {
-            any.displayName
-        }
+    if (any is Entity && any !is Player) {
+        any.get(Keys.DISPLAY_NAME).orElse(any.type.translation.id.text()).string()
+    } else if (any is Player) {
+        any.get(Keys.DISPLAY_NAME).orElse(any.name.text()).string()
+    } else if (any is CommandSource) {
+        any.name
     }
+
     return any.toString()
 }
 

@@ -78,6 +78,37 @@
                         <goals> <goal>testCompile</goal> </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- shade -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+                    <relocations>
+                        <relocation>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>me.tassu.shaded.acf</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- package all to a jar -->
@@ -97,18 +128,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- process plugin.yml -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>conf</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
             </plugin>
         </plugins>
 
@@ -139,6 +158,10 @@
             <id>central</id>
             <url>http://jcenter.bintray.com</url>
         </repository>
+        <repository>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
+        </repository>
     </repositories>
 
     <!-- DEPENDENCIES -->
@@ -158,11 +181,25 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>25.1-jre</version>
+        </dependency>
+
         <!-- config -->
         <dependency>
             <groupId>com.uchuhimo</groupId>
             <artifactId>konf</artifactId>
             <version>0.10</version>
+        </dependency>
+
+        <!-- commands framework -->
+        <dependency>
+            <groupId>co.aikar</groupId>
+            <artifactId>acf-sponge</artifactId>
+            <version>0.5.0-SNAPSHOT</version>
         </dependency>
 
         <!-- TEST DEPENDENCIES -->

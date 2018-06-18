@@ -1,11 +1,18 @@
 package me.tassu.util
 
+import me.tassu.Pumpkin
 import org.junit.Test
 
 import org.junit.Assert.*
+import org.junit.Before
 import java.io.IOException
 
 class ErrorUtilsTest {
+
+    @Before
+    fun setup() {
+        Pumpkin.textSerializer = TestTextSerializer
+    }
 
     @Test
     fun testThrows() {

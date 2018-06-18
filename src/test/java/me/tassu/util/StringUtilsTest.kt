@@ -1,6 +1,8 @@
 package me.tassu.util
 
+import me.tassu.Pumpkin
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -10,12 +12,17 @@ import java.nio.charset.StandardCharsets
 @RunWith(MockitoJUnitRunner::class)
 class StringUtilsTest {
 
+    @Before
+    fun setup() {
+        Pumpkin.textSerializer = TestTextSerializer
+    }
+
     @Test
     fun testProcessColors() {
-        assertEquals("§casd heyy!", "&casd heyy!".replaceColors())
-        assertEquals("&&", "&&".replaceColors())
-        assertEquals("& c", "& c".replaceColors())
-        assertEquals("§c", "&c".replaceColors())
+        assertEquals("§casd heyy!", "&casd heyy!".replaceColors().string())
+        assertEquals("&&", "&&".replaceColors().string())
+        assertEquals("& c", "& c".replaceColors().string())
+        assertEquals("§c", "&c".replaceColors().string())
     }
 
     @Test

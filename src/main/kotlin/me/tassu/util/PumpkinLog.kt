@@ -1,16 +1,26 @@
 package me.tassu.util
 
 import me.tassu.Pumpkin
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.text.serializer.TextSerializers
 
 object PumpkinLog {
 
-    private val logger = Pumpkin.container.logger
+    private val logger: Logger get() {
+        if (Pumpkin.container == null) return LoggerFactory.getLogger("Pumpkin")
+        return Pumpkin.container!!.logger
+    }
+
     private val debug get() = Pumpkin.debug
 
     fun info(string: String) {
-        Sponge.getGame().server.console.sendMessage(TextSerializers.FORMATTING_CODE.deserialize("&6(Pumpkin)&r $string"))
+        if (Sponge.isServerAvailable()) {
+            Sponge.getServer().console.sendMessage(TextSerializers.FORMATTING_CODE.deserialize("&6(Pumpkin)&r $string"))
+        } else {
+            logger.info(string)
+        }
     }
 
     fun debug(string: String, module: String = "") {
@@ -30,5 +40,4 @@ object PumpkinLog {
     fun warn(string: String) {
         logger.warn(string)
     }
-
 }
