@@ -1,9 +1,6 @@
 package me.tassu
 
-import co.aikar.commands.InvalidCommandArgument
-import co.aikar.commands.MessageKeys
 import co.aikar.commands.SpongeCommandManager
-import co.aikar.commands.annotation.Optional
 import com.google.common.collect.ImmutableList
 import com.google.inject.Inject
 import me.tassu.Pumpkin.DEBUG_RELOAD_CONFIG
@@ -17,11 +14,11 @@ import me.tassu.cmds.GamemodeCommand
 import me.tassu.cmds.completions.GameModeCompletion
 import me.tassu.cmds.completions.PlayerCompletion
 import me.tassu.util.pop
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader
 import org.spongepowered.api.Game
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
-import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent
@@ -31,11 +28,6 @@ import org.spongepowered.api.text.serializer.TextSerializers
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.streams.toList
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader
-import ninja.leaping.configurate.commented.CommentedConfigurationNode
-import ninja.leaping.configurate.loader.ConfigurationLoader
-
-
 
 /**
  * This is the main class of Pumpkin.
@@ -94,6 +86,9 @@ class PumpkinMain {
         if (Files.notExists(configPath)) {
             container!!.getAsset("pumpkin/pumpkin.conf").get().copyToFile(configPath)
             log.debug("-> Pumpkin.conf was saved to ${configPath!!.toFile().absolutePath}")
+
+            container!!.getAsset("pumpkin/messages.conf").get().copyToFile(configPath)
+            log.debug("-> Messages.conf was saved to ${configPath.toFile().absolutePath}")
         }
 
         log.debug("Reloading configuration from disk.", DEBUG_RELOAD_CONFIG)

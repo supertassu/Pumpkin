@@ -1,7 +1,7 @@
 package me.tassu
 
-import com.uchuhimo.konf.Config
 import me.tassu.cfg.MainConfig
+import me.tassu.msg.GeneralMessages
 import me.tassu.util.PumpkinLog
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
@@ -17,7 +17,9 @@ object Pumpkin {
             .version
 
     @get:JvmName("container") var container: PluginContainer? = null
+
     @get:JvmName("config") lateinit var config: MainConfig
+    @get:JvmName("messages") lateinit var messages: GeneralMessages
 
     const val DEBUG_RELOAD_CONFIG = "PumpkinMain#reloadConfig()"
 

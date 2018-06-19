@@ -21,6 +21,7 @@ object GamemodeCommand : BaseCommand() {
     fun set(@Suppress("UNUSED_PARAMETER") player: CommandSource,
             mode: GameMode, @Flags("defaultself") target: Player) {
         target.gameMode().set(mode)
+        TODO("send success message")
     }
 
 }

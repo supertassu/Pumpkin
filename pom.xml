@@ -188,13 +188,6 @@
             <version>25.1-jre</version>
         </dependency>
 
-        <!-- config -->
-        <dependency>
-            <groupId>com.uchuhimo</groupId>
-            <artifactId>konf</artifactId>
-            <version>0.10</version>
-        </dependency>
-
         <!-- commands framework -->
         <dependency>
             <groupId>co.aikar</groupId>

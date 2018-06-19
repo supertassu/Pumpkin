@@ -12,7 +12,7 @@ import java.io.IOException
 class MainConfig(private val loader: ConfigurationLoader<CommentedConfigurationNode>) {
 
     @Setting("pumpkin.core.debug")
-    val debug = true
+    var debug = true
 
     @Setting("pumpkin.core.enabled-commands")
     var enabledCommands: List<String> = listOf()
