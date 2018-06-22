@@ -1,6 +1,5 @@
 package me.tassu.cmds.completions
 
-import co.aikar.commands.CommandCompletionContext
 import co.aikar.commands.InvalidCommandArgument
 import co.aikar.commands.MessageKeys
 import co.aikar.commands.SpongeCommandExecutionContext

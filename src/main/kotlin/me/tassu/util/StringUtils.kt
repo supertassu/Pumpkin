@@ -7,6 +7,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColor
 import java.io.InputStream
 
 @JvmName("processColors")
@@ -15,7 +16,8 @@ fun String.replaceColors(): Text {
 }
 
 @JvmName("text")
-fun String.text(): Text {
+fun Any.text(): Text {
+    if (this is Text) return this
     return Text.of(this)
 }
 

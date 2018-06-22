@@ -7,8 +7,10 @@ import ninja.leaping.configurate.objectmapping.ObjectMapper
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.Setting
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.TextTemplate
 import org.spongepowered.api.text.TextTemplate.arg
 import org.spongepowered.api.text.TextTemplate.of
+import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.text.format.TextColors
 import java.io.IOException
 
@@ -16,18 +18,24 @@ import java.io.IOException
 class GeneralMessages(private val loader: ConfigurationLoader<CommentedConfigurationNode>) {
 
     @Setting("pumpkin.messages.meta.prefix")
-    var prefix = Text.builder("(Pumpkin) ").color(TextColors.BLUE).build()
+    var prefix: Text = Text.builder("(Pumpkin) ").color(TextColors.BLUE).build()
 
-    @Setting
-    var textColor = TextColors.GRAY
+    @Setting("pumpkin.messages.meta.text")
+    var textColor: TextColor = TextColors.GRAY
 
-    @Setting
-    var highlightColor = TextColors.BLUE
+    @Setting("pumpkin.messages.meta.highlight")
+    var highlightColor: TextColor = TextColors.BLUE
 
-    @Setting
+    @Setting("pumpkin.messages.command.general.no permissions")
     var msgNoPermissions = of(
             arg("prefix"), arg("textColor"), "You do not have the required permission (",
             arg("highlightColor"), arg("missingPermission"), arg("textColor"), ")."
+    )
+
+    @Setting("pumpkin.messages.command.general.invalid usage")
+    var msgInvalidUsage: TextTemplate = of(
+            arg("prefix"), arg("textColor"), "This command is used like so: ",
+            arg("highlightColor"), arg("usage")
     )
 
     private var configMapper: ObjectMapper<GeneralMessages>.BoundInstance? = null

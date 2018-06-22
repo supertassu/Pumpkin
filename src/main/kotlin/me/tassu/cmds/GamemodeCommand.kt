@@ -2,18 +2,19 @@ package me.tassu.cmds
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
+import me.tassu.cmds.meta.PumpkinCommand
+import me.tassu.util.sendMessage
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 
 @CommandAlias("gamemode|gm")
 @CommandPermission("pumpkin.command.gamemode.execute")
-object GamemodeCommand : BaseCommand() {
+object GamemodeCommand : PumpkinCommand() {
 
     @HelpCommand
-    fun default(@Suppress("UNUSED_PARAMETER")
-                sender: CommandSource) {
-        TODO("send help message")
+    fun default(sender: CommandSource) {
+        sender.sendMessage(messages.msgInvalidUsage, "usage" to "/gamemode <mode> [player]")
     }
 
     @CommandCompletion("@gamemode @players")

@@ -1,11 +1,9 @@
 package me.tassu.cmds.completions
 
 import co.aikar.commands.InvalidCommandArgument
-import co.aikar.commands.SpongeCommandCompletionContext
 import co.aikar.commands.SpongeCommandExecutionContext
 import co.aikar.commands.annotation.Optional
 import co.aikar.commands.contexts.ContextResolver
-import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 

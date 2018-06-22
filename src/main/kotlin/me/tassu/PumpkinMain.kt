@@ -8,14 +8,18 @@ import me.tassu.Pumpkin.config
 import me.tassu.Pumpkin.container
 import me.tassu.Pumpkin.debug
 import me.tassu.Pumpkin.log
+import me.tassu.Pumpkin.messages
 import me.tassu.Pumpkin.version
 import me.tassu.cfg.MainConfig
 import me.tassu.cmds.GamemodeCommand
 import me.tassu.cmds.completions.GameModeCompletion
 import me.tassu.cmds.completions.PlayerCompletion
-import me.tassu.util.pop
+import me.tassu.cmds.meta.CommandExceptionHandler
+import me.tassu.msg.GeneralMessages
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader
 import org.spongepowered.api.Game
+import org.spongepowered.api.config.ConfigDir
+import org.spongepowered.api.config.ConfigManager
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
@@ -39,10 +43,6 @@ class PumpkinMain {
     @Inject private lateinit var game: Game
 
     lateinit var commandManager: SpongeCommandManager
-
-    @Inject
-    @DefaultConfig(sharedRoot = false)
-    private val configPath: Path? = null
 
     @Inject
     private fun setContainer(container: PluginContainer) {
@@ -83,18 +83,26 @@ class PumpkinMain {
         // Save config files & load default configuration
         log.debug("Saving default configuration files.", DEBUG_RELOAD_CONFIG)
 
+        val configPath = game.configManager.getPluginConfig(container!!).directory.resolve("pumpkin.conf")
+        val messagesPath = game.configManager.getPluginConfig(container!!).directory.resolve("messages.conf")
+
         if (Files.notExists(configPath)) {
             container!!.getAsset("pumpkin/pumpkin.conf").get().copyToFile(configPath)
-            log.debug("-> Pumpkin.conf was saved to ${configPath!!.toFile().absolutePath}")
+            log.debug("-> Pumpkin.conf was saved to ${configPath.toFile().absolutePath}")
 
-            container!!.getAsset("pumpkin/messages.conf").get().copyToFile(configPath)
-            log.debug("-> Messages.conf was saved to ${configPath.toFile().absolutePath}")
+            container!!.getAsset("pumpkin/messages.conf").get().copyToFile(messagesPath)
+            log.debug("-> Messages.conf was saved to ${messagesPath.toFile().absolutePath}")
         }
 
         log.debug("Reloading configuration from disk.", DEBUG_RELOAD_CONFIG)
 
-        val loader = HoconConfigurationLoader.builder().setPath(configPath).build()
+        var loader = HoconConfigurationLoader.builder().setPath(configPath).build()
         config = MainConfig(loader)
+        config.save()
+
+        loader = HoconConfigurationLoader.builder().setPath(configPath).build()
+        messages = GeneralMessages(loader)
+        messages.save()
 
         // Update debug state
         debug = config.debug
@@ -114,11 +122,14 @@ class PumpkinMain {
         commandManager.commandContexts.registerContext(Player::class.java, PlayerCompletion)
         commandManager.commandContexts.registerContext(GameMode::class.java, GameModeCompletion)
 
+        log.debug("-> Registering error handler")
+        commandManager.defaultExceptionHandler = CommandExceptionHandler
+
         log.debug("-> Loading commands from configuration file.")
         val enabled = config.enabledCommands.map { it.toLowerCase() }.toMutableList()
 
         while (enabled.isNotEmpty()) {
-            val it = enabled.pop().toLowerCase()
+            val it = enabled.removeAt(0).toLowerCase()
             when (it) {
                 "gamemode" -> commandManager.registerCommand(GamemodeCommand)
                 else -> {
