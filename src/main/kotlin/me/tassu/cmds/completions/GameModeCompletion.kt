@@ -1,25 +1,39 @@
 package me.tassu.cmds.completions
 
-import co.aikar.commands.InvalidCommandArgument
-import co.aikar.commands.SpongeCommandExecutionContext
-import co.aikar.commands.annotation.Optional
-import co.aikar.commands.contexts.ContextResolver
+import me.tassu.cmds.ex.ArgumentCommandException
+import me.tassu.util.text
+import org.spongepowered.api.Game
+import org.spongepowered.api.Sponge
+import org.spongepowered.api.command.CommandSource
+import org.spongepowered.api.command.args.CommandArgs
+import org.spongepowered.api.command.args.CommandContext
+import org.spongepowered.api.command.args.CommandElement
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
+import kotlin.streams.toList
 
-object GameModeCompletion : ContextResolver<GameMode, SpongeCommandExecutionContext> {
-    override fun getContext(it: SpongeCommandExecutionContext): GameMode {
-        return when (it.popFirstArg()) {
+class GameModeCompletion(key: String) : CommandElement(key.text()) {
+
+    override fun complete(src: CommandSource?, args: CommandArgs?, context: CommandContext?): MutableList<String> {
+        return game.server.onlinePlayers.stream().filter { (src as? Player)?.canSee(it) ?: true }.map { it.name }.toList().toMutableList()
+    }
+
+    private val game: Game get() = Sponge.getGame()
+
+    override fun parseValue(source: CommandSource?, args: CommandArgs?): GameMode? {
+        val arg = args!!.next()
+
+        return when (arg) {
             "c", "crea", "creative" -> GameModes.CREATIVE
             "s", "surv", "survival" -> GameModes.SURVIVAL
             "a", "adv", "adventure" -> GameModes.ADVENTURE
             "sp", "spec", "spectator" -> GameModes.SPECTATOR
             else -> {
-                val isOptional = it.hasAnnotation(Optional::class.java)
-
-                if (isOptional) return GameModes.NOT_SET
-                throw InvalidCommandArgument("E_USER No game mode was specified.", false)
+                throw ArgumentCommandException("Game mode", "<none>")
             }
         }
     }
+
 }
+

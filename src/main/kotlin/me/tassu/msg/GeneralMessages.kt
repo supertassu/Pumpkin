@@ -17,25 +17,30 @@ import java.io.IOException
 
 class GeneralMessages(private val loader: ConfigurationLoader<CommentedConfigurationNode>) {
 
-    @Setting("pumpkin.messages.meta.prefix")
+    @Setting("prefix", comment = "Prefix applied to all messages.")
     var prefix: Text = Text.builder("(Pumpkin) ").color(TextColors.BLUE).build()
 
-    @Setting("pumpkin.messages.meta.text")
-    var textColor: Text = Text.of(TextColors.GRAY)
-
-    @Setting("pumpkin.messages.meta.highlight")
-    var highlightColor: Text = (TextColors.BLUE)
-
-    @Setting("pumpkin.messages.command.general.no permissions")
-    var msgNoPermissions = of(
-            arg("prefix"), arg("textColor"), "You do not have the required permission (",
+    @Setting("commands.no permissions")
+    var msgNoPermissions: TextTemplate = of(
+            arg("textColor"), "You do not have the required permission (",
             arg("highlightColor"), arg("missingPermission"), arg("textColor"), ")."
     )
 
-    @Setting("pumpkin.messages.command.general.invalid usage")
+    @Setting("commands.invalid usage")
     var msgInvalidUsage: TextTemplate = of(
-            arg("prefix"), arg("textColor"), "This command is used like so: ",
-            arg("highlightColor"), arg("usage")
+            TextColors.GRAY, "This command is used like so: ", arg("usage").color(TextColors.BLUE)
+    )
+
+    @Setting("commands.invalid arguments")
+    var msgInvalidArguments: TextTemplate = of(
+            TextColors.GRAY, "The value ", arg("given").color(TextColors.BLUE),
+            TextColors.GRAY, " can not be converted to a ", arg("expected").color(TextColors.BLUE),
+            TextColors.GRAY, "."
+    )
+
+    @Setting("commands.error")
+    var msgCommandException: TextTemplate = of(
+            TextColors.RED, "The following error happened whilst executing this command: ", arg("error").color(TextColors.DARK_RED)
     )
 
     private var configMapper: ObjectMapper<GeneralMessages>.BoundInstance? = null
