@@ -1,6 +1,7 @@
 package me.tassu.cmds
 
 import me.tassu.cmds.completions.GameModeCompletion
+import me.tassu.cmds.ex.ArgumentCommandException
 import me.tassu.cmds.ex.InvalidUsageException
 import me.tassu.cmds.meta.PumpkinCommand
 import org.spongepowered.api.Sponge
@@ -11,6 +12,7 @@ import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
+import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.text.Text
 
@@ -22,6 +24,10 @@ object GamemodeCommand : PumpkinCommand() {
 
         if (!mode.isPresent || !player.isPresent) {
             throw InvalidUsageException("/gamemode <mode> [player]")
+        }
+
+        if (mode.get() == GameModes.NOT_SET) {
+            throw ArgumentCommandException("Game Mode", "NOT_SET")
         }
 
         player.get().gameMode().set(mode.get())

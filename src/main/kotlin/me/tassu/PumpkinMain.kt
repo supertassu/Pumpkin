@@ -1,6 +1,5 @@
 package me.tassu
 
-import co.aikar.commands.SpongeCommandManager
 import com.google.inject.Inject
 import me.tassu.Pumpkin.DEBUG_RELOAD_CONFIG
 import me.tassu.Pumpkin.config
@@ -117,7 +116,7 @@ class PumpkinMain {
         while (enabled.isNotEmpty()) {
             val it = enabled.removeAt(0)
             when (it) {
-                "gamemode" -> GamemodeCommand.register()
+                "gamemode" -> GamemodeCommand.register(container!!)
                 else -> {
                     log.warn("*** Unknown command: $it")
                 }

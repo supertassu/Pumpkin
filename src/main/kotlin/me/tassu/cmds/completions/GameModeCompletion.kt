@@ -30,7 +30,7 @@ class GameModeCompletion(key: String) : CommandElement(key.text()) {
             "a", "adv", "adventure" -> GameModes.ADVENTURE
             "sp", "spec", "spectator" -> GameModes.SPECTATOR
             else -> {
-                throw ArgumentCommandException("Game mode", "<none>")
+                GameModes.NOT_SET
             }
         }
     }
