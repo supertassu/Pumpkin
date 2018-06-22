@@ -8,11 +8,12 @@ import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColor
+import org.spongepowered.api.text.serializer.TextSerializers
 import java.io.InputStream
 
 @JvmName("processColors")
 fun String.replaceColors(): Text {
-    return Pumpkin.textSerializer.deserialize(this)
+    return TextSerializers.FORMATTING_CODE.deserialize(this)
 }
 
 @JvmName("text")
@@ -23,7 +24,7 @@ fun Any.text(): Text {
 
 @JvmName("asString")
 fun Text.string(): String {
-    return Pumpkin.textSerializer.serialize(this)
+    return TextSerializers.FORMATTING_CODE.serialize(this)
 }
 
 @JvmName("valueOf")
@@ -44,3 +45,5 @@ fun valueOf(any: Any?): String {
 fun InputStream.readAsString(): String {
     return CharStreams.toString(this.reader())
 }
+
+operator fun Any.plus(s: String): Any = this.toString() + s

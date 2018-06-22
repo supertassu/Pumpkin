@@ -1,6 +1,5 @@
 package me.tassu.cmds
 
-import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.tassu.cmds.meta.PumpkinCommand
 import me.tassu.util.sendMessage

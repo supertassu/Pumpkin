@@ -11,10 +11,10 @@ import java.io.IOException
 
 class MainConfig(private val loader: ConfigurationLoader<CommentedConfigurationNode>) {
 
-    @Setting("pumpkin.core.debug")
+    @Setting("pumpkin.core.debug", comment = "Enables / Disables Debug mode. ")
     var debug = true
 
-    @Setting("pumpkin.core.enabled-commands")
+    @Setting("pumpkin.core.enabled commands")
     var enabledCommands: List<String> = listOf()
 
     private var configMapper: ObjectMapper<MainConfig>.BoundInstance? = null

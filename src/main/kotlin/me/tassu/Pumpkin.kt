@@ -23,6 +23,4 @@ object Pumpkin {
 
     const val DEBUG_RELOAD_CONFIG = "PumpkinMain#reloadConfig()"
 
-    @get:JvmName("textSerializer") lateinit var textSerializer: TextSerializer
-
 }

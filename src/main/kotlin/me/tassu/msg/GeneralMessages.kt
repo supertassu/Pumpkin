@@ -21,10 +21,10 @@ class GeneralMessages(private val loader: ConfigurationLoader<CommentedConfigura
     var prefix: Text = Text.builder("(Pumpkin) ").color(TextColors.BLUE).build()
 
     @Setting("pumpkin.messages.meta.text")
-    var textColor: TextColor = TextColors.GRAY
+    var textColor: Text = Text.of(TextColors.GRAY)
 
     @Setting("pumpkin.messages.meta.highlight")
-    var highlightColor: TextColor = TextColors.BLUE
+    var highlightColor: Text = (TextColors.BLUE)
 
     @Setting("pumpkin.messages.command.general.no permissions")
     var msgNoPermissions = of(

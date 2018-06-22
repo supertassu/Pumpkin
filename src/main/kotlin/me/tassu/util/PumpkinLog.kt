@@ -3,8 +3,6 @@ package me.tassu.util
 import me.tassu.Pumpkin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.spongepowered.api.Sponge
-import org.spongepowered.api.text.serializer.TextSerializers
 
 object PumpkinLog {
 
@@ -16,17 +14,13 @@ object PumpkinLog {
     private val debug get() = Pumpkin.debug
 
     fun info(string: String) {
-        if (Sponge.isServerAvailable()) {
-            Sponge.getServer().console.sendMessage(TextSerializers.FORMATTING_CODE.deserialize("&6(Pumpkin)&r $string"))
-        } else {
-            logger.info(string)
-        }
+        logger.info(string)
     }
 
     fun debug(string: String, module: String = "") {
         if (!debug) return
 
-        info("&e[DEBUG]${if (module.isNotEmpty()) " $module" else ""} &r$string")
+        info("[DEBUG${if (module.isNotEmpty()) ": $module]" else "]"} $string")
     }
 
     fun error(string: String, throwable: Throwable? = null) {
