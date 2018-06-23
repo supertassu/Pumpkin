@@ -1,17 +1,15 @@
 package me.tassu
 
 import com.google.inject.Inject
+import com.typesafe.config.ConfigFactory
 import me.tassu.Pumpkin.DEBUG_RELOAD_CONFIG
-import me.tassu.Pumpkin.config
 import me.tassu.Pumpkin.container
 import me.tassu.Pumpkin.debug
 import me.tassu.Pumpkin.log
-import me.tassu.Pumpkin.messages
 import me.tassu.Pumpkin.version
 import me.tassu.cfg.MainConfig
 import me.tassu.cmds.GamemodeCommand
 import me.tassu.msg.GeneralMessages
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader
 import org.spongepowered.api.Game
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
@@ -39,7 +37,11 @@ class PumpkinMain {
 
     @Inject
     @ConfigDir(sharedRoot = false)
-    private val configDir: Path? = null
+    private var configDir: Path? = null
+    set(value) {
+        field = value
+        Pumpkin.configDir = value!!
+    }
 
     @Listener
     @Suppress("UNUSED_PARAMETER")
@@ -74,32 +76,21 @@ class PumpkinMain {
         log.debug("Saving default configuration files.", DEBUG_RELOAD_CONFIG)
 
         val configPath = configDir!!.resolve("pumpkin.conf")
-        val messagesPath = configDir.resolve("messages.conf")
+        val messagesPath = configDir!!.resolve("messages.conf")
 
         val create = Files.notExists(configPath)
 
         if (create) {
             Files.createDirectories(configDir)
-
-            container!!.getAsset("pumpkin.conf").get().copyToFile(configPath)
-            log.debug("-> Pumpkin.conf was saved to ${configPath.toFile().absolutePath}", DEBUG_RELOAD_CONFIG)
-
-            container!!.getAsset("messages.conf").get().copyToFile(messagesPath)
-            log.debug("-> Messages.conf was saved to ${messagesPath.toFile().absolutePath}", DEBUG_RELOAD_CONFIG)
         }
 
         log.debug("Reloading configuration from disk.", DEBUG_RELOAD_CONFIG)
 
-        var loader = HoconConfigurationLoader.builder().setPath(configPath).build()
-        config = MainConfig(loader)
-        if (create) config.save()
-
-        loader = HoconConfigurationLoader.builder().setPath(messagesPath).build()
-        messages = GeneralMessages(loader)
-        if (create) messages.save()
+        MainConfig.reload()
+        GeneralMessages.reload()
 
         // Update debug state
-        debug = config.debug
+        debug = MainConfig.debug
         log.debug("New state for debug is $debug", DEBUG_RELOAD_CONFIG)
 
         // Register new commands
@@ -110,7 +101,7 @@ class PumpkinMain {
         }
 
         log.debug("-> Loading commands from configuration file.", DEBUG_RELOAD_CONFIG)
-        val enabled = config.enabledCommands.map { it.toLowerCase() }.toMutableList()
+        val enabled = MainConfig.enabledCommands.map { it.toLowerCase() }.toMutableList()
         log.debug("--> Found ${enabled.size} commands.", DEBUG_RELOAD_CONFIG)
 
         while (enabled.isNotEmpty()) {

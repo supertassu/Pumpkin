@@ -18,28 +18,32 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.text.Text
 
-object GamemodeCommand : PumpkinCommand() {
+object GamemodeCommand : PumpkinCommand("gamemode") {
 
     override fun executeCommand(src: CommandSource, args: CommandContext): CommandResult {
         val rawPlayer = args.getOne<PossibleContainer<Player>>("player")
         val rawMode = args.getOne<PossibleContainer<GameMode>>("mode")
 
-        if (!rawMode.isPresent || !rawPlayer.isPresent) {
+        if (!rawMode.isPresent) {
             throw InvalidUsageException("/gamemode <mode> [player]")
         }
 
         val mode = rawMode.get()
-        val player = rawPlayer.get()
 
         if (!mode.isPresent()) {
             throw ArgumentCommandException("Game Mode", mode.orElse())
         }
 
-        if (!player.isPresent()) {
-            throw ArgumentCommandException("Player", mode.orElse())
+        if (!rawPlayer.isPresent && src !is Player) {
+            throw ArgumentCommandException("Player", "<none>")
         }
 
-        player.get()!!.sendMessage(Text.of("setting ur gm to ${mode.get()}"))
+        val player = if (rawPlayer.isPresent) rawPlayer.get() else PossibleContainer(src as Player)
+
+        if (!player.isPresent()) {
+            throw ArgumentCommandException("Player", player.orElse())
+        }
+
         player.get()!!.offer(Keys.GAME_MODE, mode.get()!!)
         return CommandResult.affectedEntities(1)
     }

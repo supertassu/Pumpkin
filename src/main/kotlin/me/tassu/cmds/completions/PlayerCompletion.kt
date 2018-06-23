@@ -18,10 +18,8 @@ class PlayerCompletion(key: String, private var useSender: Boolean) : CommandEle
 
     private val game: Game get() = Sponge.getGame()
 
-    override fun parseValue(src: CommandSource?, args: CommandArgs?): PossibleContainer<Player> {
+    override fun parseValue(src: CommandSource?, args: CommandArgs?): PossibleContainer<Player>? {
         val arg = args!!.next()
-
-        println("\"$arg\"")
 
         if (arg.trim().isEmpty()) {
             return if (useSender && src is Player) {
