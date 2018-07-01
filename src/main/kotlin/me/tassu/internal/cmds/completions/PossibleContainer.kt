@@ -1,6 +1,4 @@
-package me.tassu.cmds.completions
-
-import org.spongepowered.api.entity.living.player.gamemode.GameMode
+package me.tassu.internal.cmds.completions
 
 class PossibleContainer<T>(private val it: T?, private val other: String? = it.toString()) {
 

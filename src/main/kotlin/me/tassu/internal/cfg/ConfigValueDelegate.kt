@@ -1,7 +1,6 @@
-package me.tassu.cfg
+package me.tassu.internal.cfg
 
-import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.serializer.TextSerializers
+import com.typesafe.config.ConfigValueType
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -17,17 +16,15 @@ class ConfigValueDelegate<T>(private val clazz: Class<T>, private val name: Stri
         if (this.lastReload > thisRef.lastReload || value == null) {
             this.lastReload = thisRef.lastReload
 
-            when {
-                clazz.isAssignableFrom(String::class.java) -> this.value = thisRef.config.getString(name) as T
-                clazz.isAssignableFrom(Boolean::class.java) -> this.value = thisRef.config.getBoolean(name) as T
-                clazz.isAssignableFrom(List::class.java) -> {
-                    val type = clazz.typeParameters[0]
-                    if (type != String::class.java) {
-                        throw IllegalArgumentException("$type is not valid list type parameter")
-                    }
+            val value = thisRef.config.getValue(name)
+
+            when (value.valueType()) {
+                ConfigValueType.STRING -> this.value = thisRef.config.getString(name) as T
+                ConfigValueType.BOOLEAN -> this.value = thisRef.config.getBoolean(name) as T
+                ConfigValueType.LIST -> {
                     this.value = thisRef.config.getStringList(name) as T
                 }
-                clazz.isAssignableFrom(Text::class.java) -> this.value = TextSerializers.FORMATTING_CODE.deserialize(thisRef.config.getString(name)) as T
+
                 else -> throw IllegalArgumentException("$clazz is not valid config object type")
             }
 

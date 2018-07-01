@@ -1,11 +1,15 @@
 package me.tassu.cmds
 
-import me.tassu.cmds.completions.GameModeCompletion
-import me.tassu.cmds.completions.PlayerCompletion
-import me.tassu.cmds.completions.PossibleContainer
-import me.tassu.cmds.ex.ArgumentCommandException
-import me.tassu.cmds.ex.InvalidUsageException
-import me.tassu.cmds.meta.PumpkinCommand
+import me.tassu.internal.cfg.GeneralMessages
+import me.tassu.internal.cmds.completions.GameModeCompletion
+import me.tassu.internal.cmds.completions.PlayerCompletion
+import me.tassu.internal.cmds.completions.PossibleContainer
+import me.tassu.internal.cmds.ex.ArgumentCommandException
+import me.tassu.internal.cmds.ex.InvalidUsageException
+import me.tassu.internal.cmds.meta.PumpkinCommand
+import me.tassu.internal.util.formatColoredMessage
+import me.tassu.internal.util.getAllMessageReceiversWithPermission
+import me.tassu.internal.util.sendColoredMessage
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -45,6 +49,34 @@ object GamemodeCommand : PumpkinCommand("gamemode") {
         }
 
         player.get()!!.offer(Keys.GAME_MODE, mode.get()!!)
+
+        if (src is Player && src.uniqueId == player.get()!!.uniqueId) {
+            src.sendColoredMessage(GeneralMessages.cmdGmSetOwn,
+                    "mode" to mode.get()!!.name)
+
+            val message = GeneralMessages.cmdOtherGmSetOwn.formatColoredMessage(
+                    "actor" to src.name,
+                    "mode" to mode.get()!!.name,
+                    "target" to player.get()!!.name)
+
+            server.getAllMessageReceiversWithPermission("pumpkin.command.gamemode.view")
+                    .filter { it != src }
+                    .forEach { it.sendMessage(message) }
+
+        } else {
+            src.sendColoredMessage(GeneralMessages.cmdGmSetOther,
+                    "mode" to mode.get()!!.name, "target" to player.get()!!.name)
+
+            val message = GeneralMessages.cmdOtherGmSetOther.formatColoredMessage(
+                    "actor" to src.name,
+                    "mode" to mode.get()!!.name,
+                    "target" to player.get()!!.name)
+
+            server.getAllMessageReceiversWithPermission("pumpkin.command.gamemode.view")
+                    .filter { it != src }
+                    .forEach { it.sendMessage(message) }
+        }
+
         return CommandResult.affectedEntities(1)
     }
 

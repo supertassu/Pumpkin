@@ -1,6 +1,6 @@
 package me.tassu
 
-import me.tassu.util.PumpkinLog
+import me.tassu.internal.util.PumpkinLog
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import java.nio.file.Path

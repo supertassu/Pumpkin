@@ -1,3 +1,3 @@
-package me.tassu.cmds.ex
+package me.tassu.internal.cmds.ex
 
 class ArgumentCommandException(var paramType: String, var given: Any) : Exception()

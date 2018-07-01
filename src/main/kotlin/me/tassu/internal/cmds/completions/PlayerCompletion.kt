@@ -1,6 +1,6 @@
-package me.tassu.cmds.completions
+package me.tassu.internal.cmds.completions
 
-import me.tassu.util.text
+import me.tassu.internal.util.text
 import org.spongepowered.api.Game
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandSource

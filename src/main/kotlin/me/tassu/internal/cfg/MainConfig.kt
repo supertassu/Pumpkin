@@ -1,8 +1,9 @@
-package me.tassu.cfg
+package me.tassu.internal.cfg
 
 object MainConfig : Configurable("pumpkin", "core") {
 
     val debug by provide<Boolean>("debug")
     val enabledCommands by provide<List<String>>("enabled commands")
+    val enabledFeatures by provide<List<String>>("enabled features")
 
 }

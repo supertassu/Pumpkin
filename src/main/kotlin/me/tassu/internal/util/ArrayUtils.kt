@@ -1,4 +1,4 @@
-package me.tassu.util
+package me.tassu.internal.util
 
 import java.util.stream.Stream
 

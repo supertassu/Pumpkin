@@ -1,4 +1,4 @@
-package me.tassu.cfg
+package me.tassu.internal.cfg
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -25,12 +25,12 @@ abstract class Configurable(private val name: String, val prefix: String = name)
     internal var lastReload: Long = System.currentTimeMillis()
 
     inline fun <reified T> provide(key: String): ConfigValueDelegate<T> {
-        return ConfigValueDelegate(T::class.java, "pumpkin.$prefix.key")
+        return ConfigValueDelegate(T::class.java, key)
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun reload() {
-        config = ConfigFactory.parseString(path.toFile().readText(Charsets.UTF_8))
+        config = ConfigFactory.parseString(path.toFile().readText(Charsets.UTF_8)).getConfig("pumpkin.$prefix")
         lastReload = System.currentTimeMillis()
     }
 

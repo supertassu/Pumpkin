@@ -1,4 +1,4 @@
-package me.tassu.util
+package me.tassu.internal.util
 
 @JvmName("isMethodPresent")
 fun Any.containsMethod(id: String): Boolean {

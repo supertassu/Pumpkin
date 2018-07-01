@@ -1,13 +1,11 @@
-package me.tassu.util
+package me.tassu.internal.util
 
 import com.google.common.io.CharStreams
-import me.tassu.Pumpkin
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.text.serializer.TextSerializers
 import java.io.InputStream
 
