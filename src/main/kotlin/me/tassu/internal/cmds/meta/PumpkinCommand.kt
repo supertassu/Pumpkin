@@ -1,14 +1,12 @@
 package me.tassu.internal.cmds.meta
 
+import me.tassu.internal.cfg.GeneralMessages
 import me.tassu.internal.cmds.ex.ArgumentCommandException
 import me.tassu.internal.cmds.ex.InternalCommandException
 import me.tassu.internal.cmds.ex.InvalidUsageException
 import me.tassu.internal.cmds.ex.PermissionCommandException
-import me.tassu.internal.cfg.GeneralMessages.cmdArgs
-import me.tassu.internal.cfg.GeneralMessages.cmdError
-import me.tassu.internal.cfg.GeneralMessages.cmdUsage
-import me.tassu.internal.cfg.GeneralMessages.cmdNoPerms
-import me.tassu.internal.util.sendColoredMessage
+import me.tassu.internal.di.PumpkinHolder
+import me.tassu.internal.util.kt.sendColoredMessage
 import org.spongepowered.api.Game
 import org.spongepowered.api.Server
 import org.spongepowered.api.Sponge
@@ -19,6 +17,8 @@ import org.spongepowered.api.command.spec.CommandExecutor
 import org.spongepowered.api.plugin.PluginContainer
 
 abstract class PumpkinCommand(private val name: String) : CommandExecutor {
+
+    protected val generalMessages: GeneralMessages get() = PumpkinHolder.getInstance().messages
 
     abstract fun register(container: PluginContainer)
 
@@ -33,10 +33,10 @@ abstract class PumpkinCommand(private val name: String) : CommandExecutor {
             result = executeCommand(src, args!!)
         } catch (e: Exception) {
             when (e) {
-                is PermissionCommandException -> src!!.sendColoredMessage(cmdNoPerms, "perm" to e.permission)
-                is InternalCommandException -> src!!.sendColoredMessage(cmdError, "error" to e.friendlyMessage)
-                is ArgumentCommandException -> src!!.sendColoredMessage(cmdArgs, "given" to e.given, "expected" to e.paramType)
-                is InvalidUsageException -> src!!.sendColoredMessage(cmdUsage, "usage" to e.usage)
+                is PermissionCommandException -> src!!.sendColoredMessage(generalMessages.commands.noPerms, "perm" to e.permission)
+                is InternalCommandException -> src!!.sendColoredMessage(generalMessages.commands.error, "error" to e.friendlyMessage)
+                is ArgumentCommandException -> src!!.sendColoredMessage(generalMessages.commands.args, "given" to e.given, "expected" to e.paramType)
+                is InvalidUsageException -> src!!.sendColoredMessage(generalMessages.commands.usage, "usage" to e.usage)
                 else -> throw e
             }
 

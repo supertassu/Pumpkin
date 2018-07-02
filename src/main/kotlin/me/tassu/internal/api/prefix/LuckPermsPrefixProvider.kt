@@ -1,5 +1,6 @@
 package me.tassu.internal.api.prefix
 
+import com.google.inject.Inject
 import org.spongepowered.api.entity.living.player.Player
 import me.lucko.luckperms.api.LuckPermsApi
 import org.spongepowered.api.Sponge
@@ -8,11 +9,11 @@ import me.tassu.internal.cfg.GeneralMessages
 
 class LuckPermsPrefixProvider : PrefixProvider {
 
-    private val luckPerms: LuckPermsApi
+    @Inject
+    private lateinit var generalMessages: GeneralMessages
 
-    init {
-        val provider = Sponge.getServiceManager().getRegistration(LuckPermsApi::class.java)
-        luckPerms = provider.get().provider
+    private val luckPerms by lazy {
+        Sponge.getServiceManager().getRegistration(LuckPermsApi::class.java).get().provider
     }
 
     private fun getChatMeta(player: Player, type: ChatMetaType): String? {
@@ -33,15 +34,15 @@ class LuckPermsPrefixProvider : PrefixProvider {
     private fun format(string: String?, type: ChatMetaType): String {
         return if (type == ChatMetaType.PREFIX) {
             if (string == null) {
-                GeneralMessages.prefixNo
+                generalMessages.chat.prefixes.none
             } else {
-                GeneralMessages.prefixYes.replace("{{value}}", string)
+                generalMessages.chat.prefixes.present.replace("{{value}}", string)
             }
         } else {
             if (string == null) {
-                GeneralMessages.suffixNo
+                generalMessages.chat.suffixes.none
             } else {
-                GeneralMessages.suffixYes.replace("{{value}}", string)
+                generalMessages.chat.suffixes.present.replace("{{value}}", string)
             }
         }
     }

@@ -1,13 +1,13 @@
-package me.tassu.internal.util
+package me.tassu.internal.util.kt
 
-import me.tassu.internal.cfg.GeneralMessages
+import me.tassu.internal.di.PumpkinHolder
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.serializer.TextSerializers
 
 operator fun Text.plus(other: Text): Text = this.concat(other)
 
-fun prefix(): Text = TextSerializers.FORMATTING_CODE.deserialize(GeneralMessages.msgPrefix)
+fun prefix(): Text = TextSerializers.FORMATTING_CODE.deserialize(PumpkinHolder.getInstance().messages.meta.msgPrefix)
 
 fun String.formatColoredMessage(vararg placeholders: Pair<String, Any>): Text {
     return this.formatMessage(true, *placeholders)

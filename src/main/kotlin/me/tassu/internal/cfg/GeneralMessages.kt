@@ -1,27 +1,132 @@
 package me.tassu.internal.cfg
 
-object GeneralMessages : Configurable("messages") {
+import com.google.inject.Inject
+import com.google.inject.Singleton
+import com.google.inject.name.Named
+import ninja.leaping.configurate.SimpleConfigurationNode
+import ninja.leaping.configurate.commented.CommentedConfigurationNode
+import ninja.leaping.configurate.loader.ConfigurationLoader
+import ninja.leaping.configurate.objectmapping.ObjectMapper
+import ninja.leaping.configurate.objectmapping.ObjectMappingException
+import ninja.leaping.configurate.objectmapping.Setting
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable
+import java.io.IOException
 
-    // general
-    val msgPrefix by provide<String>("meta.prefix")
+@Singleton
+class GeneralMessages {
 
-    // chat related
-    val prefixYes by provide<String>("chat.prefix.present")
-    val prefixNo by provide<String>("chat.prefix.none")
-    val suffixYes by provide<String>("chat.suffix.present")
-    val suffixNo by provide<String>("chat.suffix.none")
-    val chatFormat by provide<String>("chat.format")
-    
-    // general command related
-    val cmdNoPerms by provide<String>("commands.no permissions")
-    val cmdUsage by provide<String>("commands.usage")
-    val cmdArgs by provide<String>("commands.args")
-    val cmdError by provide<String>("commands.error")
+    private var configMapper: ObjectMapper<GeneralMessages>.BoundInstance = ObjectMapper.forObject(this)
+    @Inject @Named("messages") lateinit var loader: ConfigurationLoader<CommentedConfigurationNode>
 
-    // /gamemode related
-    val cmdGmSetOwn by provide<String>("commands.gamemode.msg self own")
-    val cmdGmSetOther by provide<String>("commands.gamemode.msg self other")
-    val cmdOtherGmSetOwn by provide<String>("commands.gamemode.msg others own")
-    val cmdOtherGmSetOther by provide<String>("commands.gamemode.msg others other")
+    fun init() {
+        this.reload()
+        this.save()
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun save() {
+        try {
+            val out = SimpleConfigurationNode.root()
+            this.configMapper.serialize(out)
+            this.loader.save(out)
+        } catch (e: ObjectMappingException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+    }
+
+    fun reload() {
+        try {
+            this.configMapper.populate(this.loader.load())
+        } catch (e: ObjectMappingException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+    }
+
+    @Setting
+    var meta = MetaMessages()
+
+    @ConfigSerializable
+    class MetaMessages {
+
+        @Setting("prefix")
+        var msgPrefix = "&9(Pumpkin) "
+
+    }
+
+    @Setting
+    var chat = ChatMessages()
+
+    @ConfigSerializable
+    class ChatMessages {
+
+        @ConfigSerializable
+        class Prefix {
+            @Setting
+            var present = "{{value}} "
+
+            @Setting
+            var none = ""
+        }
+
+        @Setting
+        var prefixes = Prefix()
+
+        @ConfigSerializable
+        class Suffix {
+            @Setting
+            val present = " {{value}}"
+
+            @Setting
+            var none = ""
+        }
+
+        @Setting
+        val suffixes = Suffix()
+
+        @Setting
+        var format = "NOPREFIX|&a{{user_prefix}}{{user_name}}{{user_suffix}}&7: &f{{text}}"
+    }
+
+    @Setting
+    var commands = CommandMessages()
+
+    @ConfigSerializable
+    class CommandMessages {
+        @Setting("no permissions")
+        var noPerms = "&7You do not have the required permission (&9{{perm}}&7) to execute this command."
+
+        @Setting
+        var usage = "&7This command is used like &9{{usage}}"
+
+        @Setting
+        var args = "&7The value &9{{given}}&7 can not be converted to a &9{{expected}}&7."
+
+        @Setting
+        var error = "NOPREFIX|&4(Pumpkin) &cThe following error happened whilst executing the command: &4{{error}}"
+
+        @Setting
+        val gamemode = GameMode()
+
+        @ConfigSerializable
+        class GameMode {
+            @Setting("msg self own")
+            var setOwn = "&7Your game mode was set to &9{{mode}}&7."
+
+            @Setting("msg set other")
+            var setOther = "&7Game mode of &9{{target}}&7 was set to &9{{mode}}&7."
+
+            @Setting("msg others own")
+            var otherSetOwn = "&7[&9{{actor}}&7]: Updated own game mode to &9{{mode}}&7."
+
+            @Setting("msg others other")
+            var otherSetOther = "&7[&9{{actor}}&7]: Updated game mode of &9{{target}}&7 to &9{{mode}}&7."
+        }
+    }
 
 }

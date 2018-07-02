@@ -1,6 +1,6 @@
 package me.tassu.internal.cmds.completions
 
-import me.tassu.internal.util.text
+import me.tassu.internal.util.kt.text
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandArgs
 import org.spongepowered.api.command.args.CommandContext

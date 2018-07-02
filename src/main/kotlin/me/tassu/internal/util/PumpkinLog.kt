@@ -1,17 +1,23 @@
 package me.tassu.internal.util
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import me.tassu.Pumpkin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.spongepowered.api.plugin.PluginContainer
 
-object PumpkinLog {
+@Singleton
+class PumpkinLog {
+
+    @Inject private lateinit var container: PluginContainer
+    @Inject private lateinit var instance: Pumpkin
 
     private val logger: Logger get() {
-        if (Pumpkin.container == null) return LoggerFactory.getLogger("Pumpkin")
-        return Pumpkin.container!!.logger
+        return container.logger
     }
 
-    private val debug get() = Pumpkin.debug
+    private val debug get() = instance.debug
 
     fun info(string: String) {
         logger.info(string)
