@@ -50,7 +50,8 @@ class Pumpkin {
 
     private val features by lazy {
         return@lazy mapOf<String, Feature>(
-                "chat" to featureHolder.chat
+                "chat" to featureHolder.chat,
+                "punishments" to featureHolder.punishment
         )
     }
 
