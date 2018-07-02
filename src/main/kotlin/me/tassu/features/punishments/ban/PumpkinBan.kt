@@ -2,6 +2,7 @@ package me.tassu.features.punishments.ban
 
 import me.tassu.features.punishments.AbstractPunishment
 import me.tassu.features.punishments.PunishmentFeature
+import me.tassu.features.punishments.PunishmentType
 import me.tassu.internal.util.kt.text
 import me.tassu.internal.util.kt.toOptional
 import org.spongepowered.api.Sponge
@@ -16,6 +17,8 @@ import java.time.Instant
 import java.util.*
 
 class PumpkinBan(resultSet: ResultSet) : AbstractPunishment(resultSet), Ban {
+
+    override val type: PunishmentType = PunishmentType.BAN
 
     override fun getType(): BanType {
         return BanTypes.PROFILE
