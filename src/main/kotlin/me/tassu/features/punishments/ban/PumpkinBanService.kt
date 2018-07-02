@@ -98,7 +98,9 @@ class PumpkinBanService : BanService {
      * @return True if the ban exists in this ban service, false otherwise
      */
     override fun hasBan(ban: Ban?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (ban == null) return false
+        if (ban !is PumpkinBan) return false
+        return ban.hasNotExpired()
     }
 
     /**

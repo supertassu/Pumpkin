@@ -25,6 +25,15 @@ abstract class AbstractPunishment(resultSet: ResultSet) : Punishment {
     override val revokedOn: Long? by lazy { resultSet.getLong("revoked_on") }
     override val revokeReason: String? by lazy { resultSet.getString("revoke_reason") }
 
-    override val type: PunishmentType = PunishmentType.BAN
+    fun hasExpired(): Boolean {
+        if (revokedBy != null) return true
+        if (expiresOn == null) return false
+        return expiresOn!! >= System.currentTimeMillis()
+    }
+
+    fun hasNotExpired(): Boolean {
+        return !hasExpired()
+    }
+
 
 }
