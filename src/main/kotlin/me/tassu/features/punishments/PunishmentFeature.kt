@@ -29,9 +29,9 @@ class PunishmentFeature : Feature {
         enabled = true
         banService = Sponge.getServiceManager().provide(BanService::class.java).get()
     }
+
     override fun disable() {
         enabled = false
     }
-
 
 }
