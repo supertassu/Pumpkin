@@ -7,6 +7,7 @@ import me.tassu.internal.api.prefix.PrefixProvider
 import me.tassu.internal.cfg.GeneralMessages
 import me.tassu.internal.cfg.MainConfig
 import me.tassu.internal.cmds.meta.CommandHolder
+import me.tassu.internal.db.DatabaseManager
 import me.tassu.internal.feature.Feature
 import me.tassu.internal.feature.FeatureHolder
 import me.tassu.internal.util.PumpkinLog
@@ -15,6 +16,7 @@ import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent
+import org.spongepowered.api.event.game.state.GameStoppedServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import java.nio.file.Files
@@ -39,6 +41,8 @@ class Pumpkin {
 
     @Inject private lateinit var commands: CommandHolder
     @Inject private lateinit var featureHolder: FeatureHolder
+
+    @Inject private lateinit var databaseManager: DatabaseManager
 
     // prefix provides
     @Inject private lateinit var emptyPrefixProvider: PrefixProvider.DummyPrefixProvider
@@ -72,9 +76,27 @@ class Pumpkin {
         log.info("All rights reserved.")
         log.info("")
 
+
         // Init configurations
+        log.debug("Initializating configurations", "Pumpkin#serverStarting()")
         mainConfig.init()
         generalMessages.init()
+
+        // Connect to database
+        log.debug("Connecting to database", "Pumpkin#serverStarting()")
+
+        try {
+            databaseManager.connect()
+        } catch (e: Exception) {
+            log.error("Could not connect to database.", e)
+            throw RuntimeException("Database connection failed.", e)
+        }
+
+        val ping = databaseManager.ping()
+
+        if (ping.containsKey("Ping")) {
+            log.debug("-> Ping to database is ${ping["Ping"]}", "Pumpkin#serverStarting()")
+        }
 
         // Register dependencies
         log.debug("Registering dependencies", "Pumpkin#serverStarting()")
@@ -167,6 +189,17 @@ class Pumpkin {
         log.debug("-> Reloaded ${mainConfig.enabledFeatures.size} features", "Pumpkin#reloadConfig()")
 
         log.info("Pumpkin was reloaded in ${System.currentTimeMillis() - startTime} ms.")
+    }
+
+    @Listener
+    @Suppress("UNUSED_PARAMETER")
+    fun serverStopping(event: GameStoppedServerEvent) {
+        if (databaseManager.isConnected()) {
+            log.debug("Disconnecting from database... ", "Pumpkin#serverStopping()")
+            databaseManager.disconnect()
+        }
+
+        log.debug("We're done. Bye! ", "Pumpkin#serverStopping()")
     }
 
 }

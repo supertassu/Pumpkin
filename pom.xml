@@ -189,6 +189,13 @@
             <version>4.2.0</version>
         </dependency>
 
+        <!-- hikaricp -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
         <!-- OPTIONAL DEPENDENCIES -->
         <dependency>
             <groupId>me.lucko.luckperms</groupId>

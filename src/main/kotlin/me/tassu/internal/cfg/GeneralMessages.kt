@@ -3,8 +3,8 @@ package me.tassu.internal.cfg
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.google.inject.name.Named
-import ninja.leaping.configurate.SimpleConfigurationNode
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
+import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import ninja.leaping.configurate.objectmapping.ObjectMapper
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
@@ -26,7 +26,7 @@ class GeneralMessages {
     @Suppress("MemberVisibilityCanBePrivate")
     fun save() {
         try {
-            val out = SimpleConfigurationNode.root()
+            val out = SimpleCommentedConfigurationNode.root()
             this.configMapper.serialize(out)
             this.loader.save(out)
         } catch (e: ObjectMappingException) {
