@@ -16,6 +16,7 @@ import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent
+import org.spongepowered.api.event.game.state.GameStoppedServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import java.nio.file.Files
@@ -188,6 +189,17 @@ class Pumpkin {
         log.debug("-> Reloaded ${mainConfig.enabledFeatures.size} features", "Pumpkin#reloadConfig()")
 
         log.info("Pumpkin was reloaded in ${System.currentTimeMillis() - startTime} ms.")
+    }
+
+    @Listener
+    @Suppress("UNUSED_PARAMETER")
+    fun serverStopping(event: GameStoppedServerEvent) {
+        if (databaseManager.isConnected()) {
+            log.debug("Disconnecting from database... ", "Pumpkin#serverStopping()")
+            databaseManager.disconnect()
+        }
+
+        log.debug("We're done. Bye! ", "Pumpkin#serverStopping()")
     }
 
 }

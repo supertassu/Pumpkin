@@ -20,6 +20,7 @@ import java.nio.file.Path
 @Plugin(
         id = "pumpkin",
         name = "Pumpkin",
+        version = "0.0.1",
         dependencies = [
             Dependency(
                     id = "luckperms",
@@ -37,6 +38,7 @@ class PumpkinLoader {
     private lateinit var configDir: Path
 
     @Listener
+    @Suppress("UNUSED_PARAMETER")
     fun init(event: GameInitializationEvent) {
         val pumpkin = Pumpkin()
         val injector = PumpkinModule(container, pumpkin, configDir).createInjector()

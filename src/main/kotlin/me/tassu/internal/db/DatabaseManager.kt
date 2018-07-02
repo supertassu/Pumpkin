@@ -20,27 +20,29 @@ class DatabaseManager {
      * Connects to the database.
      */
     fun connect() {
-        if (::connector.isInitialized) {
+        if (connected) {
             throw IllegalStateException("Already connected.")
         }
 
         connector = type.clazz.newInstance()
         connector.connect(mainConfig.database)
+        connected = true
     }
 
     fun disconnect() {
-        if (!::connector.isInitialized) {
+        if (!connected) {
             throw IllegalStateException("Not connected yet.")
         }
 
         connector.disconnect()
+        connected = false
     }
 
     /**
      * Pings the database.
      */
     fun ping(): Map<String, String> {
-        if (!::connector.isInitialized) {
+        if (!connected) {
             throw IllegalStateException("Not connected yet. Call #connect() to connect.")
         }
 

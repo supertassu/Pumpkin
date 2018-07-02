@@ -65,7 +65,9 @@ abstract class AbstractHikariConnector : IDatabaseConnector {
     }
 
     override fun disconnect() {
-        TODO("Not implemented yet.")
+        if (!hikari.isClosed) {
+            hikari.close()
+        }
     }
 
 }
