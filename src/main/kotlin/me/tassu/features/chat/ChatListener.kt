@@ -1,36 +1,26 @@
-package me.tassu.features.misc
+package me.tassu.features.chat
 
+import com.google.inject.Inject
 import me.tassu.internal.api.prefix.PrefixProvider
 import me.tassu.internal.cfg.GeneralMessages
-import me.tassu.internal.util.Feature
-import me.tassu.internal.util.formatColoredMessage
-import me.tassu.internal.util.string
+import me.tassu.internal.feature.Feature
+import me.tassu.internal.util.kt.formatColoredMessage
+import me.tassu.internal.util.kt.string
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.message.MessageChannelEvent
 
+class ChatListener {
 
-class ChatListener : Feature {
+    @Inject private lateinit var module: ChatModule
 
-    var enabled: Boolean = false
-
-    lateinit var prefixProvider: PrefixProvider
-    lateinit var format: String
-
-    override fun enable() {
-        enabled = true
-        prefixProvider = Sponge.getServiceManager().provideUnchecked(PrefixProvider::class.java)
-        format = GeneralMessages.chatFormat
-    }
-
-    override fun disable() {
-        enabled = false
-    }
+    internal lateinit var prefixProvider: PrefixProvider
+    internal lateinit var format: String
 
     @Listener
     fun onChat(event: MessageChannelEvent.Chat) {
-        if (!enabled) return
+        if (!module.enabled) return
 
         val player = event.cause.first(Player::class.java).get()
 

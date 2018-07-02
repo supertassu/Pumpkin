@@ -1,4 +1,4 @@
-package me.tassu.internal.util
+package me.tassu.internal.util.kt
 
 @JvmName("throws")
 fun (() -> Any).throws(vararg target: Class<out Throwable>): Boolean {

@@ -1,4 +1,4 @@
-package me.tassu.internal.util
+package me.tassu.internal.util.kt
 
 import com.google.common.io.CharStreams
 import org.spongepowered.api.command.CommandSource

@@ -1,4 +1,4 @@
-package me.tassu.internal.util
+package me.tassu.internal.util.kt
 
 import org.spongepowered.api.Server
 import org.spongepowered.api.text.channel.MessageReceiver

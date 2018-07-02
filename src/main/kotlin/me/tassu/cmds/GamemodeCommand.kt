@@ -1,15 +1,14 @@
 package me.tassu.cmds
 
-import me.tassu.internal.cfg.GeneralMessages
 import me.tassu.internal.cmds.completions.GameModeCompletion
 import me.tassu.internal.cmds.completions.PlayerCompletion
 import me.tassu.internal.cmds.completions.PossibleContainer
 import me.tassu.internal.cmds.ex.ArgumentCommandException
 import me.tassu.internal.cmds.ex.InvalidUsageException
 import me.tassu.internal.cmds.meta.PumpkinCommand
-import me.tassu.internal.util.formatColoredMessage
-import me.tassu.internal.util.getAllMessageReceiversWithPermission
-import me.tassu.internal.util.sendColoredMessage
+import me.tassu.internal.util.kt.formatColoredMessage
+import me.tassu.internal.util.kt.getAllMessageReceiversWithPermission
+import me.tassu.internal.util.kt.sendColoredMessage
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -22,7 +21,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.text.Text
 
-object GamemodeCommand : PumpkinCommand("gamemode") {
+class GamemodeCommand : PumpkinCommand("gamemode") {
 
     override fun executeCommand(src: CommandSource, args: CommandContext): CommandResult {
         val rawPlayer = args.getOne<PossibleContainer<Player>>("player")
@@ -51,10 +50,10 @@ object GamemodeCommand : PumpkinCommand("gamemode") {
         player.get()!!.offer(Keys.GAME_MODE, mode.get()!!)
 
         if (src is Player && src.uniqueId == player.get()!!.uniqueId) {
-            src.sendColoredMessage(GeneralMessages.cmdGmSetOwn,
+            src.sendColoredMessage(generalMessages.commands.gamemode.setOwn,
                     "mode" to mode.get()!!.name)
 
-            val message = GeneralMessages.cmdOtherGmSetOwn.formatColoredMessage(
+            val message = generalMessages.commands.gamemode.otherSetOwn.formatColoredMessage(
                     "actor" to src.name,
                     "mode" to mode.get()!!.name,
                     "target" to player.get()!!.name)
@@ -64,10 +63,10 @@ object GamemodeCommand : PumpkinCommand("gamemode") {
                     .forEach { it.sendMessage(message) }
 
         } else {
-            src.sendColoredMessage(GeneralMessages.cmdGmSetOther,
+            src.sendColoredMessage(generalMessages.commands.gamemode.setOther,
                     "mode" to mode.get()!!.name, "target" to player.get()!!.name)
 
-            val message = GeneralMessages.cmdOtherGmSetOther.formatColoredMessage(
+            val message = generalMessages.commands.gamemode.otherSetOther.formatColoredMessage(
                     "actor" to src.name,
                     "mode" to mode.get()!!.name,
                     "target" to player.get()!!.name)
