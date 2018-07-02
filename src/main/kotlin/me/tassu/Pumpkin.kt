@@ -7,6 +7,7 @@ import me.tassu.internal.api.prefix.PrefixProvider
 import me.tassu.internal.cfg.GeneralMessages
 import me.tassu.internal.cfg.MainConfig
 import me.tassu.internal.cmds.meta.CommandHolder
+import me.tassu.internal.db.DatabaseManager
 import me.tassu.internal.feature.Feature
 import me.tassu.internal.feature.FeatureHolder
 import me.tassu.internal.util.PumpkinLog
@@ -40,6 +41,8 @@ class Pumpkin {
     @Inject private lateinit var commands: CommandHolder
     @Inject private lateinit var featureHolder: FeatureHolder
 
+    @Inject private lateinit var databaseManager: DatabaseManager
+
     // prefix provides
     @Inject private lateinit var emptyPrefixProvider: PrefixProvider.DummyPrefixProvider
     @Inject private lateinit var luckPermsPrefixProvider: LuckPermsPrefixProvider
@@ -72,9 +75,27 @@ class Pumpkin {
         log.info("All rights reserved.")
         log.info("")
 
+
         // Init configurations
+        log.debug("Initializating configurations", "Pumpkin#serverStarting()")
         mainConfig.init()
         generalMessages.init()
+
+        // Connect to database
+        log.debug("Connecting to database", "Pumpkin#serverStarting()")
+
+        try {
+            databaseManager.connect()
+        } catch (e: Exception) {
+            log.error("Could not connect to database.", e)
+            throw RuntimeException("Database connection failed.", e)
+        }
+
+        val ping = databaseManager.ping()
+
+        if (ping.containsKey("Ping")) {
+            log.debug("-> Ping to database is ${ping["Ping"]}", "Pumpkin#serverStarting()")
+        }
 
         // Register dependencies
         log.debug("Registering dependencies", "Pumpkin#serverStarting()")
