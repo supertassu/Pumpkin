@@ -27,6 +27,25 @@ class GeneralMessages {
     fun save() {
         try {
             val out = SimpleCommentedConfigurationNode.root()
+            out.setComment("""
+                  ____  __ __ ___  ___ ____  __ __ __ __  __
+                  || \\ || || ||\\//|| || \\ || // || ||\ ||
+                  ||_// || || || \/ || ||_// ||<<  || ||\\||
+                  ||    \\_// ||    || ||    || \\ || || \||
+
+                    This is the translation file of Pumpkin,
+                    the powerful server core plugin.
+
+                    TASSU ==========
+                    https://tassu.me
+                    pumpkin@tassu.me
+
+
+                    Prefix a string with "NOPREFIX|" to make the prefix not appear before the message.
+
+                    This configuration file uses the Human-Optimized Config Object Notation (HOCON) for formatting.
+                    Learn more at https://github.com/lightbend/config/blob/master/HOCON.md
+            """.trimIndent())
             this.configMapper.serialize(out)
             this.loader.save(out)
         } catch (e: ObjectMappingException) {

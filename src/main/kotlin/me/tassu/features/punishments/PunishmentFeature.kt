@@ -5,11 +5,14 @@ import com.google.inject.Singleton
 import me.tassu.internal.feature.Feature
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.Sponge
-
-
+import java.util.*
 
 @Singleton
 class PunishmentFeature : Feature {
+
+    companion object {
+        val CONSOLE_UUID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+    }
 
     @Inject
     private lateinit var connectListener: ConnectListener

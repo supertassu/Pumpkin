@@ -46,6 +46,8 @@ class PumpkinLoader {
         injector.injectMembers(pumpkin)
         injector.injectMembers(PumpkinHolder())
 
+        PumpkinHolder.getInstance().injector = injector
+
         Sponge.getEventManager().registerListeners(this, pumpkin)
     }
 

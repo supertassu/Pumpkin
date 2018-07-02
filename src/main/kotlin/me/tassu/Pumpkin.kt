@@ -49,7 +49,7 @@ class Pumpkin {
     @Inject private lateinit var luckPermsPrefixProvider: LuckPermsPrefixProvider
 
     private val features by lazy {
-        return@lazy mapOf<String, Feature>(
+        return@lazy mapOf(
                 "chat" to featureHolder.chat,
                 "punishments" to featureHolder.punishment
         )
