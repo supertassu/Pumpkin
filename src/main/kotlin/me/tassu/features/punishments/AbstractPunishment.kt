@@ -20,8 +20,8 @@ abstract class AbstractPunishment(resultSet: ResultSet) : Punishment {
     override val targetIp: InetAddress? = if (targetType == BanTypes.IP) InetAddress.getByName(resultSet.getString("target")) else null
 
     override val actor: UUID = UUID.fromString(resultSet.getString("actor"))
-    override val date: Long = resultSet.getLong("date")
-    override val expiresOn: Long? = resultSet.getLong("expires_on")
+    override val date: Long = resultSet.getLong("unix_timestamp(date)")
+    override val expiresOn: Long? = resultSet.getLong("unix_timestamp(expires_on)")
     override val reason: String = resultSet.getString("reason")
 
     final override val revokedBy: UUID?
@@ -35,7 +35,7 @@ abstract class AbstractPunishment(resultSet: ResultSet) : Punishment {
         }
     }
 
-    override val revokedOn: Long? = resultSet.getLong("revoked_on")
+    override val revokedOn: Long? = resultSet.getLong("unix_timestamp(revoked_on)")
     override val revokeReason: String? = resultSet.getString("revoke_reason")
 
     fun hasExpired(): Boolean {
