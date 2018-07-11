@@ -73,25 +73,25 @@ class Pumpkin {
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun serverStarting(event: GameAboutToStartServerEvent) {
-        log.info("  &2____  __ __ ___  ___ ____  __ __ __ __  __")
-        log.info("  &a|| \\\\ || || ||\\\\//|| || \\\\ || // || ||\\ ||")
-        log.info("  &a||_// || || || \\/ || ||_// ||<<  || ||\\\\||")
-        log.info("  &a||    \\\\_// ||    || ||    || \\\\ || || \\||")
+        log.info("  §2____  __ __ ___  ___ ____  __ __ __ __  __")
+        log.info("  §a|| \\\\ || || ||\\\\//|| || \\\\ || // || ||\\ ||")
+        log.info("  §a||_// || || || \\/ || ||_// ||<<  || ||\\\\||")
+        log.info("  §a||    \\\\_// ||    || ||    || \\\\ || || \\||")
         log.info("")
-        log.info(" -=> &2LOADING PUMPKIN &a$version")
+        log.info("§a -=> §2STARTING PUMPKIN §a$version")
         log.info("")
         log.info("Copyright (c) Tassu <pumpkin@tassu.me>.")
         log.info("All rights reserved.")
         log.info("")
-
+        val timer = System.currentTimeMillis()
 
         // Init configurations
-        log.debug("Initializating configurations", "Pumpkin#serverStarting()")
+        log.info("Initializating configurations")
         mainConfig.init()
         generalMessages.init()
 
         // Connect to database
-        log.debug("Connecting to database", "Pumpkin#serverStarting()")
+        log.info("Connecting to database")
 
         try {
             databaseManager.connect()
@@ -103,24 +103,24 @@ class Pumpkin {
         val ping = databaseManager.ping()
 
         if (ping.containsKey("Ping")) {
-            log.debug("-> Ping to database is ${ping["Ping"]}", "Pumpkin#serverStarting()")
+            log.info("-> Ping to database is ${ping["Ping"]}")
         }
 
         // Register dependencies
-        log.debug("Registering dependencies", "Pumpkin#serverStarting()")
+        log.info("Registering dependencies")
 
         val pluginManager = game.pluginManager
 
         // Prefix
         if (pluginManager.getPlugin("luckperms").isPresent) {
-            log.debug("-> Found dependency \"LuckPerms\" for provider \"Prefix\"", "Pumpkin#serverStarting()")
+            log.info("-> Found dependency \"LuckPerms\" for provider \"Prefix\"")
             game.serviceManager.setProvider(instance, PrefixProvider::class.java, injector.getInstance(LuckPermsPrefixProvider::class.java))
         } else {
             game.serviceManager.setProvider(instance, PrefixProvider::class.java, injector.getInstance(PrefixProvider.DummyPrefixProvider::class.java))
         }
 
         // Register features as listeners
-        log.debug("Registering features", "Pumpkin#serverStarting()")
+        log.info("Registering features")
 
         val permissionService = game.serviceManager.provideUnchecked(PermissionService::class.java)
 
@@ -139,45 +139,46 @@ class Pumpkin {
         }
 
         reloadConfig()
+
+        log.info("§aPumpkin was started in ${System.currentTimeMillis() - timer} ms.")
     }
 
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun reload(event: GameReloadEvent) {
+        val timer = System.currentTimeMillis()
+        log.info("§aReloading Pumpkin...")
         reloadConfig()
+        log.info("§aPumpkin was reloaded in ${System.currentTimeMillis() - timer} ms.")
     }
 
     private fun reloadConfig() {
-        log.info("Reloading Pumpkin... ")
-
-        val startTime = System.currentTimeMillis()
-
         // Save config files & reload default configuration
-        log.debug("Saving default configuration files.", "Pumpkin#reloadConfig()")
+        log.info("Saving default configuration files.")
 
         if (Files.notExists(configDir)) {
             Files.createDirectories(configDir)
         }
 
-        log.debug("Reloading configuration from disk.", "Pumpkin#reloadConfig()")
+        log.info("Reloading configuration from disk.")
 
         mainConfig.reload()
         generalMessages.reload()
 
         // Update debug state
         debug = mainConfig.debug
-        log.debug("New state for debug is $debug", "Pumpkin#reloadConfig()")
+        log.info("New state for debug is $debug")
 
         // Register new commands
-        log.debug("Registering commands, this might take a while.", "Pumpkin#reloadConfig()")
-        log.debug("-> Unregistering old commands", "Pumpkin#reloadConfig()")
+        log.info("Registering commands, this might take a while.")
+        log.info("-> Unregistering old commands")
         Sponge.getCommandManager().getOwnedBy(container).forEach {
             Sponge.getCommandManager().removeMapping(it)
         }
 
-        log.debug("-> Loading commands from configuration file.", "Pumpkin#reloadConfig()")
+        log.info("-> Loading commands from configuration file.")
         val enabledCommands = mainConfig.enabledCommands.map { it.toLowerCase() }.toMutableList()
-        log.debug("--> Found ${enabledCommands.size} commands.", "Pumpkin#reloadConfig()")
+        log.info("--> Found ${enabledCommands.size} commands.")
 
         while (enabledCommands.isNotEmpty()) {
             val it = enabledCommands.removeAt(0)
@@ -193,9 +194,9 @@ class Pumpkin {
             log.warn("** Found ${enabledCommands.size} unknown commands: ${enabledCommands.joinToString()}")
         }
 
-        log.debug("-> All commands registered.", "Pumpkin#reloadConfig()")
+        log.info("-> All commands registered.")
 
-        log.debug("Reloading features", "Pumpkin#reloadConfig()")
+        log.info("Reloading features")
 
         val enabledFeatures = mutableSetOf<String>()
 
@@ -213,27 +214,25 @@ class Pumpkin {
             }
         }
 
-        log.debug("-> Reloaded ${enabledFeatures.size} features (including dependencies).", "Pumpkin#reloadConfig()")
+        log.info("-> Reloaded ${enabledFeatures.size} features (including dependencies).")
 
-        log.debug("Starting CacheCleaner.", "Pumpkin#reloadConfig()")
+        log.info("Starting CacheCleaner.")
         game.scheduler.createTaskBuilder()
                 .async()
                 .interval(1, TimeUnit.MINUTES)
                 .execute(cacheCleaner)
                 .submit(instance)
-
-        log.info("Pumpkin was reloaded in ${System.currentTimeMillis() - startTime} ms.")
     }
 
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun serverStopping(event: GameStoppedServerEvent) {
         if (databaseManager.isConnected()) {
-            log.debug("Disconnecting from database... ", "Pumpkin#serverStopping()")
+            log.info("Disconnecting from database... ")
             databaseManager.disconnect()
         }
 
-        log.debug("We're done. Bye! ", "Pumpkin#serverStopping()")
+        log.info("We're done. Bye! ")
     }
 
 }

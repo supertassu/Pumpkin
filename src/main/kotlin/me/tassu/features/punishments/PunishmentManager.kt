@@ -3,6 +3,8 @@ package me.tassu.features.punishments
 import com.google.inject.Inject
 import me.tassu.features.punishments.ban.PumpkinBan
 import me.tassu.internal.db.table.tables.PunishmentsTable
+import org.spongepowered.api.util.ban.BanType
+import java.net.InetAddress
 import java.sql.ResultSet
 import java.util.*
 
@@ -10,28 +12,20 @@ class PunishmentManager {
 
     @Inject private lateinit var punishmentTable: PunishmentsTable
 
-    private fun getFromResultSet(result: ResultSet): Punishment {
-         return when (result.getString("type")) {
-            "ban" -> PumpkinBan(result)
-            else -> {
-                throw IllegalArgumentException("FAIL: Punishment type ${result.getString("type")} is not supported.")
-            }
-        }
+    fun getAllPunishments(): Set<Punishment> {
+        return punishmentTable.queryAll()
     }
 
-    fun getAllPunishments() {
-
+    fun getAllPunishments(type: BanType): Set<Punishment> {
+        return punishmentTable.queryByType(type)
     }
 
     fun getPunishmentsForUser(uuid: UUID): Set<Punishment> {
-        val set = mutableSetOf<Punishment>()
-        val result = punishmentTable.queryByTargetUuid(uuid)
+        return punishmentTable.queryByTargetUuid(uuid)
+    }
 
-        while (result.next()) {
-            set.add(getFromResultSet(result))
-        }
-
-        return set
+    fun getPunishmentsForIp(ip: InetAddress): Set<Punishment> {
+        return punishmentTable.queryByTargetIp(ip)
     }
 
 }

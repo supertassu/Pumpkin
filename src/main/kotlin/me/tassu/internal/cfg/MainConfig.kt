@@ -85,7 +85,7 @@ class MainConfig {
     class DatabaseConfig {
 
         @Setting
-        var type = DatabaseType.MARIADB
+        var type = DatabaseType.MYSQL
 
         @Setting
         var host = "localhost"

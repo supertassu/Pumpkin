@@ -66,7 +66,7 @@ class MetaTable : AbstractTable() {
                 }
             }
 
-            log.debug("Found schema versions for ${map.size} tables.", "MetaTable#load()")
+            log.info("Found schema versions for ${map.size} tables.")
 
             result.close()
             loaded = map

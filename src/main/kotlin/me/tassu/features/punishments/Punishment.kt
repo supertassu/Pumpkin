@@ -1,12 +1,16 @@
 package me.tassu.features.punishments
 
+import java.net.InetAddress
 import java.util.*
 
 interface Punishment {
 
     val type: PunishmentType
-    val target: UUID
     val actor: UUID
+
+    /* BOTH targetUuid AND targetIp SHOULD NOT BE NULL */
+    val targetUuid: UUID?
+    val targetIp: InetAddress?
 
     val date: Long
     val expiresOn: Long?

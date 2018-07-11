@@ -7,21 +7,23 @@ import me.tassu.internal.util.kt.text
 import me.tassu.internal.util.kt.toOptional
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandSource
+import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.util.ban.Ban
 import org.spongepowered.api.util.ban.BanType
 import org.spongepowered.api.util.ban.BanTypes
+import java.net.InetAddress
 import java.sql.ResultSet
 import java.time.Instant
 import java.util.*
 
-class PumpkinBan(resultSet: ResultSet) : AbstractPunishment(resultSet), Ban {
+abstract class PumpkinBan(resultSet: ResultSet) : AbstractPunishment(resultSet), Ban {
 
     override val type: PunishmentType = PunishmentType.BAN
 
     override fun getType(): BanType {
-        return BanTypes.PROFILE
+        return targetType
     }
 
     override fun getBanSource(): Optional<Text> {
@@ -55,6 +57,30 @@ class PumpkinBan(resultSet: ResultSet) : AbstractPunishment(resultSet), Ban {
     init {
         if (resultSet.getString("type") != "ban") {
             throw IllegalArgumentException("FAIL: Punishment type ${resultSet.getString("type")} is not a ban.")
+        }
+    }
+
+    class Ip(resultSet: ResultSet) : PumpkinBan(resultSet), Ban.Ip {
+        init {
+            if (this.targetType != BanTypes.IP) {
+                throw IllegalArgumentException("FAIL: Invalid target type $targetType, expected IP.")
+            }
+        }
+
+        override fun getAddress(): InetAddress {
+            return targetIp!!
+        }
+    }
+
+    class Uuid(resultSet: ResultSet) : PumpkinBan(resultSet), Ban.Profile {
+        init {
+            if (this.targetType != BanTypes.PROFILE) {
+                throw IllegalArgumentException("FAIL: Invalid target type $targetType, expected PROFILE.")
+            }
+        }
+
+        override fun getProfile(): GameProfile {
+            return GameProfile.of(targetUuid!!)
         }
     }
 

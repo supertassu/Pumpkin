@@ -1,14 +1,21 @@
 package me.tassu.features.punishments.ban
 
+import com.google.inject.Inject
 import com.google.inject.Singleton
+import me.tassu.features.punishments.PunishmentManager
+import me.tassu.features.punishments.PunishmentType
+import me.tassu.internal.util.kt.toOptional
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.util.ban.Ban
+import org.spongepowered.api.util.ban.BanTypes
 import java.net.InetAddress
 import java.util.*
 
 @Singleton
 class PumpkinBanService : BanService {
+
+    @Inject private lateinit var punishmentManager: PunishmentManager
 
     /**
      * Checks if a [GameProfile] has a ban.
@@ -16,8 +23,12 @@ class PumpkinBanService : BanService {
      * @param profile The profile
      * @return True if the profile has a ban, false otherwise
      */
-    override fun isBanned(profile: GameProfile?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun isBanned(profile: GameProfile): Boolean {
+        return punishmentManager
+                .getPunishmentsForUser(profile.uniqueId)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan }
+                .any { it.hasNotExpired() }
     }
 
     /**
@@ -26,8 +37,12 @@ class PumpkinBanService : BanService {
      * @param address The address
      * @return True if the address has a ban, false otherwise
      */
-    override fun isBanned(address: InetAddress?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun isBanned(address: InetAddress): Boolean {
+        return punishmentManager
+                .getPunishmentsForIp(address)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan }
+                .any { it.hasNotExpired() }
     }
 
     /**
@@ -39,9 +54,11 @@ class PumpkinBanService : BanService {
      *
      * @param ban The ban to add to this ban service
      * @return The previous ban, if available
+     *
+     * @todo Implement
      */
     override fun addBan(ban: Ban?): Optional<out Ban> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Optional.empty()
     }
 
     /**
@@ -50,7 +67,11 @@ class PumpkinBanService : BanService {
      * @return All registered IP bans
      */
     override fun getIpBans(): MutableCollection<Ban.Ip> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return punishmentManager
+                .getAllPunishments(BanTypes.IP)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan.Ip }
+                .toMutableSet()
     }
 
     /**
@@ -59,8 +80,13 @@ class PumpkinBanService : BanService {
      * @param profile The profile
      * @return The ban, if available
      */
-    override fun getBanFor(profile: GameProfile?): Optional<Ban.Profile> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getBanFor(profile: GameProfile): Optional<Ban.Profile> {
+        return punishmentManager
+                .getPunishmentsForUser(profile.uniqueId)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan.Uuid }
+                .first { it.hasNotExpired() }
+                .toOptional()
     }
 
     /**
@@ -70,7 +96,12 @@ class PumpkinBanService : BanService {
      * @return All registered IP bans
      */
     override fun getBanFor(address: InetAddress?): Optional<Ban.Ip> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return punishmentManager
+                .getPunishmentsForIp(address!!)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan.Ip }
+                .first { it.hasNotExpired() }
+                .toOptional()
     }
 
     /**
@@ -79,7 +110,11 @@ class PumpkinBanService : BanService {
      * @return All registered bans
      */
     override fun getBans(): MutableCollection<out Ban> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return punishmentManager
+                .getAllPunishments()
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan }
+                .toMutableSet()
     }
 
     /**
@@ -87,9 +122,10 @@ class PumpkinBanService : BanService {
      *
      * @param ban The ban
      * @return Whether the ban was present in this ban service
+     * @todo IMPLEMENT
      */
     override fun removeBan(ban: Ban?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return false
     }
 
     /**
@@ -109,9 +145,10 @@ class PumpkinBanService : BanService {
      *
      * @param profile The profile
      * @return Whether the profile had a ban present
+     * @todo Implement
      */
     override fun pardon(profile: GameProfile?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return false
     }
 
     /**
@@ -119,9 +156,10 @@ class PumpkinBanService : BanService {
      *
      * @param address The IP address
      * @return Whether the address had a ban present
+     * @todo Implement
      */
     override fun pardon(address: InetAddress?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return false
     }
 
     /**
@@ -130,6 +168,10 @@ class PumpkinBanService : BanService {
      * @return All registered [GameProfile] bans
      */
     override fun getProfileBans(): MutableCollection<Ban.Profile> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return punishmentManager
+                .getAllPunishments(BanTypes.PROFILE)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan.Uuid }
+                .toMutableSet()
     }
 }
