@@ -44,8 +44,8 @@ class PumpkinBan(resultSet: ResultSet) : AbstractPunishment(resultSet), Ban {
 
     override fun getBanCommandSource(): Optional<CommandSource> {
         if (this.actor == PunishmentFeature.CONSOLE_UUID) return Sponge.getServer().console.toOptional()
-        val player = Sponge.getServer().getPlayer(this.actor).orElse(null)
-        return player.toOptional()
+        val player = Sponge.getServer().getPlayer(this.actor)
+        return (player as CommandSource).toOptional()
     }
 
     override fun getReason(): Optional<Text> {

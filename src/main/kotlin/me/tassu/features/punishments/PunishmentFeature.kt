@@ -2,24 +2,29 @@ package me.tassu.features.punishments
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import me.tassu.features.punishments.ban.PumpkinBanService
 import me.tassu.internal.feature.Feature
+import me.tassu.internal.util.PumpkinLog
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.plugin.PluginContainer
 import java.util.*
 
 @Singleton
 class PunishmentFeature : Feature {
 
     companion object {
-        val CONSOLE_UUID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+        val CONSOLE_UUID: UUID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
     }
 
-    @Inject
-    private lateinit var connectListener: ConnectListener
+    @Inject private lateinit var connectListener: ConnectListener
+    @Inject private lateinit var container: PluginContainer
+
+    @Inject private lateinit var logger: PumpkinLog
 
     private var enabled: Boolean = false
 
-    internal lateinit var banService: BanService
+    @Inject internal lateinit var banService: BanService
 
     override val listeners: List<Any> by lazy {
         listOf(connectListener)
@@ -27,11 +32,19 @@ class PunishmentFeature : Feature {
 
     override fun enable() {
         enabled = true
-        banService = Sponge.getServiceManager().provide(BanService::class.java).get()
+
+        Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
     }
 
     override fun disable() {
         enabled = false
+
+        if (Sponge.getServiceManager().provide(BanService::class.java).orElse(null) is PumpkinBanService) {
+            logger.warn("[WARN] BanService was disabled.")
+        }
     }
 
+    override val id: String = "punishments"
+    override val permissions: List<String> = listOf()
+    override val dependencies: List<String> = listOf()
 }

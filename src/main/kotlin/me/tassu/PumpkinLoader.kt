@@ -40,14 +40,10 @@ class PumpkinLoader {
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun init(event: GameInitializationEvent) {
-        val pumpkin = Pumpkin()
-        val injector = PumpkinModule(container, pumpkin, configDir).createInjector()
-
-        injector.injectMembers(pumpkin)
+        val injector = PumpkinModule(container, configDir).createInjector()
         injector.injectMembers(PumpkinHolder())
 
-        PumpkinHolder.getInstance().injector = injector
-
+        val pumpkin = injector.getInstance(Pumpkin::class.java)
         Sponge.getEventManager().registerListeners(this, pumpkin)
     }
 

@@ -5,7 +5,7 @@ import com.google.inject.Guice
 import com.google.inject.Injector
 import com.google.inject.Provides
 import com.google.inject.name.Named
-import me.tassu.Pumpkin
+import me.tassu.features.punishments.ban.PumpkinBanService
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader
 import ninja.leaping.configurate.loader.ConfigurationLoader
@@ -13,26 +13,34 @@ import org.spongepowered.api.Game
 import org.spongepowered.api.Server
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.service.ban.BanService
 import java.nio.file.Files
 import java.nio.file.Path
 
-class PumpkinModule(private val container: PluginContainer, private val pumpkin: Pumpkin, private val configDir: Path) : AbstractModule() {
+/**
+ * The Guice module.
+ * @see PumpkinHolder
+ */
+class PumpkinModule(private val container: PluginContainer, private val configDir: Path) : AbstractModule() {
+
+    private val injector: Injector = Guice.createInjector(this)
 
     fun createInjector(): Injector {
-        return Guice.createInjector(this)
+        return injector
     }
 
     override fun configure() {
-        // plugin instance etc
         this.bind(PluginContainer::class.java).toInstance(container)
-        this.bind(Pumpkin::class.java).toInstance(pumpkin)
+        this.bind(Path::class.java).toInstance(configDir)
+
+        this.bind(Injector::class.java).toInstance(injector)
 
         // sponge stuff
         this.bind(Game::class.java).toInstance(Sponge.getGame())
         this.bind(Server::class.java).toInstance(Sponge.getServer())
 
-        // config dir
-        this.bind(Path::class.java).toInstance(configDir)
+        // features
+        this.bind(BanService::class.java).to(PumpkinBanService::class.java)
     }
 
     @Provides @Named("pumpkin") internal fun providePumpkinConfigurationLoader(): ConfigurationLoader<CommentedConfigurationNode> {

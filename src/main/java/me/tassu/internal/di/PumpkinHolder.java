@@ -8,12 +8,10 @@ import me.tassu.internal.cfg.MainConfig;
 public class PumpkinHolder {
 
     private static PumpkinHolder instance = null;
-    public static PumpkinHolder getInstance() {
-        return instance;
-    }
+    public static PumpkinHolder getInstance() { return instance; }
     public PumpkinHolder() { instance = this; }
 
-    public Injector injector;
+    @Inject public Injector injector;
 
     @Inject public GeneralMessages messages;
     @Inject public MainConfig mainConfig;

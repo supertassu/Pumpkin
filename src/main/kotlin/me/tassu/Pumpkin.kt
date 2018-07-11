@@ -8,9 +8,9 @@ import me.tassu.internal.cfg.GeneralMessages
 import me.tassu.internal.cfg.MainConfig
 import me.tassu.internal.cmds.meta.CommandHolder
 import me.tassu.internal.db.DatabaseManager
-import me.tassu.internal.feature.Feature
 import me.tassu.internal.feature.FeatureHolder
 import me.tassu.internal.util.PumpkinLog
+import me.tassu.internal.util.kt.text
 import org.spongepowered.api.Game
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.Listener
@@ -19,6 +19,8 @@ import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.service.permission.PermissionDescription
+import org.spongepowered.api.service.permission.PermissionService
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -51,7 +53,8 @@ class Pumpkin {
     private val features by lazy {
         return@lazy mapOf(
                 "chat" to featureHolder.chat,
-                "punishments" to featureHolder.punishment
+                "punishments" to featureHolder.punishment,
+                "user_data" to featureHolder.userData
         )
     }
 
@@ -112,12 +115,22 @@ class Pumpkin {
             game.serviceManager.setProvider(instance, PrefixProvider::class.java, emptyPrefixProvider)
         }
 
-        // Register features as commands
+        // Register features as listeners
         log.debug("Registering features", "Pumpkin#serverStarting()")
+
+        val permissionService = game.serviceManager.provideUnchecked(PermissionService::class.java)
+        val builder = permissionService.newDescriptionBuilder(instance)
 
         features.forEach { _, it ->
             Sponge.getEventManager().registerListeners(instance, it)
             it.listeners.forEach { listener -> Sponge.getEventManager().registerListeners(instance, listener) }
+
+            it.permissions.forEach { perm ->
+                builder.id("pumpkin.feature.${it.id}.$perm")
+                        .description("Permission registered by feature ${it.id}".text())
+                        .assign(PermissionDescription.ROLE_STAFF, true)
+                        .register()
+            }
         }
 
         reloadConfig()
@@ -158,11 +171,11 @@ class Pumpkin {
         }
 
         log.debug("-> Loading commands from configuration file.", "Pumpkin#reloadConfig()")
-        val enabled = mainConfig.enabledCommands.map { it.toLowerCase() }.toMutableList()
-        log.debug("--> Found ${enabled.size} commands.", "Pumpkin#reloadConfig()")
+        val enabledCommands = mainConfig.enabledCommands.map { it.toLowerCase() }.toMutableList()
+        log.debug("--> Found ${enabledCommands.size} commands.", "Pumpkin#reloadConfig()")
 
-        while (enabled.isNotEmpty()) {
-            val it = enabled.removeAt(0)
+        while (enabledCommands.isNotEmpty()) {
+            val it = enabledCommands.removeAt(0)
             when (it) {
                 "gamemode" -> commands.gameModeCommand.register(container)
                 else -> {
@@ -171,16 +184,24 @@ class Pumpkin {
             }
         }
 
-        if (enabled.isNotEmpty()) {
-            log.warn("** Found ${enabled.size} unknown commands: ${enabled.joinToString()}")
+        if (enabledCommands.isNotEmpty()) {
+            log.warn("** Found ${enabledCommands.size} unknown commands: ${enabledCommands.joinToString()}")
         }
 
         log.debug("-> All commands registered.", "Pumpkin#reloadConfig()")
 
         log.debug("Reloading features", "Pumpkin#reloadConfig()")
 
+        val enabledFeatures = mutableSetOf<String>()
+
+        mainConfig.enabledFeatures.forEach {
+            val feature = features[it.toLowerCase()] ?: return@forEach
+            enabledFeatures.add(feature.id)
+            enabledFeatures.addAll(feature.dependencies)
+        }
+
         features.forEach { id, feature ->
-            if (mainConfig.enabledFeatures.contains(id)) {
+            if (enabledFeatures.contains(id)) {
                 feature.enable()
             } else {
                 feature.disable()

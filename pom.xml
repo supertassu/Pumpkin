@@ -12,7 +12,7 @@
     <!-- KOTLIN CONFIGURATION -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.2.50</kotlin.version>
+        <kotlin.version>1.2.51</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>

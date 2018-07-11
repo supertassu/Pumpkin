@@ -9,6 +9,7 @@ import java.util.*
 
 @Singleton
 class PumpkinBanService : BanService {
+
     /**
      * Checks if a [GameProfile] has a ban.
      *

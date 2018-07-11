@@ -74,7 +74,7 @@ class GeneralMessages {
     class MetaMessages {
 
         @Setting("prefix")
-        var msgPrefix = "&9(Pumpkin) "
+        var msgPrefix = "&a(Pumpkin) "
 
     }
 
@@ -93,7 +93,7 @@ class GeneralMessages {
             var none = ""
         }
 
-        @Setting
+        @Setting(comment = "The prefix will not be included if not specified manually. No worries.")
         var prefixes = Prefix()
 
         @ConfigSerializable
@@ -105,7 +105,7 @@ class GeneralMessages {
             var none = ""
         }
 
-        @Setting
+        @Setting(comment = "The prefix will not be included if not specified manually. No worries.")
         val suffixes = Suffix()
 
         @Setting
@@ -118,13 +118,13 @@ class GeneralMessages {
     @ConfigSerializable
     class CommandMessages {
         @Setting("no permissions")
-        var noPerms = "&7You do not have the required permission (&9{{perm}}&7) to execute this command."
+        var noPerms = "&7You do not have the required permission (&2{{perm}}&7) to execute this command."
 
         @Setting
-        var usage = "&7This command is used like &9{{usage}}"
+        var usage = "&7This command is used like &2{{usage}}"
 
         @Setting
-        var args = "&7The value &9{{given}}&7 can not be converted to a &9{{expected}}&7."
+        var args = "&7The value &2{{given}}&7 can not be converted to a &2{{expected}}&7."
 
         @Setting
         var error = "NOPREFIX|&4(Pumpkin) &cThe following error happened whilst executing the command: &4{{error}}"
@@ -135,16 +135,16 @@ class GeneralMessages {
         @ConfigSerializable
         class GameMode {
             @Setting("msg self own")
-            var setOwn = "&7Your game mode was set to &9{{mode}}&7."
+            var setOwn = "&7Your game mode was set to &2{{mode}}&7."
 
             @Setting("msg set other")
-            var setOther = "&7Game mode of &9{{target}}&7 was set to &9{{mode}}&7."
+            var setOther = "&7Game mode of &2{{target}}&7 was set to &2{{mode}}&7."
 
             @Setting("msg others own")
-            var otherSetOwn = "&7[&9{{actor}}&7]: Updated own game mode to &9{{mode}}&7."
+            var otherSetOwn = "&7[&2{{actor}}&7]: Updated own game mode to &2{{mode}}&7."
 
             @Setting("msg others other")
-            var otherSetOther = "&7[&9{{actor}}&7]: Updated game mode of &9{{target}}&7 to &9{{mode}}&7."
+            var otherSetOther = "&7[&2{{actor}}&7]: Updated game mode of &2{{target}}&7 to &2{{mode}}&7."
         }
     }
 

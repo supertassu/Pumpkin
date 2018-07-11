@@ -1,4 +1,4 @@
-package me.tassu.features.chat
+package me.tassu.features.misc
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -13,9 +13,9 @@ import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.message.MessageChannelEvent
 
 @Singleton
-class ChatModule : Feature {
+class ChatFeature : Feature {
 
-    override val listeners: List<Any> = listOf()
+    override val id: String = "chat"
 
     private lateinit var prefixProvider: PrefixProvider
     private lateinit var format: String
@@ -50,8 +50,10 @@ class ChatModule : Feature {
                 "user_prefix" to prefix,
                 "user_suffix" to suffix,
                 "user_name" to player.name,
-                "text" to rawMessage.replace("&", "")))
+                "text" to rawMessage.replace("&", "&\\")))
     }
 
-
+    override val listeners: List<Any> = listOf()
+    override val permissions: List<String> = listOf("color")
+    override val dependencies: List<String> = listOf()
 }

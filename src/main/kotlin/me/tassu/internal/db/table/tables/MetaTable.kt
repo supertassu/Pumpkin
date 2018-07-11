@@ -48,11 +48,11 @@ class MetaTable : AbstractTable() {
             if (!result.next()) {
                 s.execute(nameReplacer.apply(CREATE_TABLE_SCHEMA))
 
-                it.prepareStatement(nameReplacer.apply(INSERT_ENTRY_SCHEMA)).use { s ->
-                    s.setString(1, getName())
-                    s.setInt(2, getCurrentVersion())
-                    s.setInt(3, getCurrentVersion())
-                    s.execute()
+                it.prepareStatement(nameReplacer.apply(INSERT_ENTRY_SCHEMA)).use { update ->
+                    update.setString(1, getName())
+                    update.setInt(2, getCurrentVersion())
+                    update.setInt(3, getCurrentVersion())
+                    update.execute()
                 }
 
                 log.debug("Table ${getName()} was created.", "MetaTable#load()")
