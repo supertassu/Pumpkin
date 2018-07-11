@@ -141,10 +141,10 @@ class GeneralMessages {
             var setOther = "&7Game mode of &2{{target}}&7 was set to &2{{mode}}&7."
 
             @Setting("msg others own")
-            var otherSetOwn = "&7[&2{{actor}}&7]: Updated own game mode to &2{{mode}}&7."
+            var otherSetOwn = "&2{{actor}} set own game mode to &2{{mode}}&7."
 
             @Setting("msg others other")
-            var otherSetOther = "&7[&2{{actor}}&7]: Updated game mode of &2{{target}}&7 to &2{{mode}}&7."
+            var otherSetOther = "&2{{actor}}&7 set game mode of &2{{target}}&7 to &2{{mode}}&7."
         }
     }
 

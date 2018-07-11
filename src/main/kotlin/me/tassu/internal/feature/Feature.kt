@@ -22,6 +22,11 @@ interface Feature {
     fun disable()
 
     /**
+     * Called by the cache cleaner every minute.
+     */
+    fun clearCache() {}
+
+    /**
      * List of all [org.spongepowered.api.event.Listener]s that this module requires.
      * PLEASE NOTE: They are always registered, use [enable] and [disable] to control their state.
      */

@@ -23,17 +23,13 @@ import java.nio.file.Path
  */
 class PumpkinModule(private val container: PluginContainer, private val configDir: Path) : AbstractModule() {
 
-    private val injector: Injector = Guice.createInjector(this)
-
     fun createInjector(): Injector {
-        return injector
+        return Guice.createInjector(this)
     }
 
     override fun configure() {
         this.bind(PluginContainer::class.java).toInstance(container)
         this.bind(Path::class.java).toInstance(configDir)
-
-        this.bind(Injector::class.java).toInstance(injector)
 
         // sponge stuff
         this.bind(Game::class.java).toInstance(Sponge.getGame())
@@ -64,5 +60,4 @@ class PumpkinModule(private val container: PluginContainer, private val configDi
 
         return HoconConfigurationLoader.builder().setPath(file).build()
     }
-
 }

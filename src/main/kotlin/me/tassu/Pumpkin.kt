@@ -1,6 +1,7 @@
 package me.tassu
 
 import com.google.inject.Inject
+import com.google.inject.Injector
 import com.google.inject.Singleton
 import me.tassu.internal.api.prefix.LuckPermsPrefixProvider
 import me.tassu.internal.api.prefix.PrefixProvider
@@ -9,6 +10,7 @@ import me.tassu.internal.cfg.MainConfig
 import me.tassu.internal.cmds.meta.CommandHolder
 import me.tassu.internal.db.DatabaseManager
 import me.tassu.internal.feature.FeatureHolder
+import me.tassu.internal.util.CacheClearer
 import me.tassu.internal.util.PumpkinLog
 import me.tassu.internal.util.kt.text
 import org.spongepowered.api.Game
@@ -23,6 +25,7 @@ import org.spongepowered.api.service.permission.PermissionDescription
 import org.spongepowered.api.service.permission.PermissionService
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 
 /**
  * This is the main class of Pumpkin.
@@ -45,12 +48,13 @@ class Pumpkin {
     @Inject private lateinit var featureHolder: FeatureHolder
 
     @Inject private lateinit var databaseManager: DatabaseManager
+    @Inject private lateinit var cacheCleaner: CacheClearer
 
-    // prefix provides
-    @Inject private lateinit var emptyPrefixProvider: PrefixProvider.DummyPrefixProvider
-    @Inject private lateinit var luckPermsPrefixProvider: LuckPermsPrefixProvider
+    private val injector: Injector by lazy {
+        PumpkinLoader.injector
+    }
 
-    private val features by lazy {
+    val features by lazy {
         return@lazy mapOf(
                 "chat" to featureHolder.chat,
                 "punishments" to featureHolder.punishment,
@@ -65,16 +69,16 @@ class Pumpkin {
             .filterIsInstance(Plugin::class.java)
             .first()
             .version
-    
+
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun serverStarting(event: GameAboutToStartServerEvent) {
-        log.info("  ____  __ __ ___  ___ ____  __ __ __ __  __")
-        log.info("  || \\\\ || || ||\\\\//|| || \\\\ || // || ||\\ ||")
-        log.info("  ||_// || || || \\/ || ||_// ||<<  || ||\\\\||")
-        log.info("  ||    \\\\_// ||    || ||    || \\\\ || || \\||")
+        log.info("  &2____  __ __ ___  ___ ____  __ __ __ __  __")
+        log.info("  &a|| \\\\ || || ||\\\\//|| || \\\\ || // || ||\\ ||")
+        log.info("  &a||_// || || || \\/ || ||_// ||<<  || ||\\\\||")
+        log.info("  &a||    \\\\_// ||    || ||    || \\\\ || || \\||")
         log.info("")
-        log.info(" -=> LOADING PUMPKIN $version")
+        log.info(" -=> &2LOADING PUMPKIN &a$version")
         log.info("")
         log.info("Copyright (c) Tassu <pumpkin@tassu.me>.")
         log.info("All rights reserved.")
@@ -110,22 +114,23 @@ class Pumpkin {
         // Prefix
         if (pluginManager.getPlugin("luckperms").isPresent) {
             log.debug("-> Found dependency \"LuckPerms\" for provider \"Prefix\"", "Pumpkin#serverStarting()")
-            game.serviceManager.setProvider(instance, PrefixProvider::class.java, luckPermsPrefixProvider)
+            game.serviceManager.setProvider(instance, PrefixProvider::class.java, injector.getInstance(LuckPermsPrefixProvider::class.java))
         } else {
-            game.serviceManager.setProvider(instance, PrefixProvider::class.java, emptyPrefixProvider)
+            game.serviceManager.setProvider(instance, PrefixProvider::class.java, injector.getInstance(PrefixProvider.DummyPrefixProvider::class.java))
         }
 
         // Register features as listeners
         log.debug("Registering features", "Pumpkin#serverStarting()")
 
         val permissionService = game.serviceManager.provideUnchecked(PermissionService::class.java)
-        val builder = permissionService.newDescriptionBuilder(instance)
 
         features.forEach { _, it ->
             Sponge.getEventManager().registerListeners(instance, it)
             it.listeners.forEach { listener -> Sponge.getEventManager().registerListeners(instance, listener) }
 
             it.permissions.forEach { perm ->
+                val builder = permissionService.newDescriptionBuilder(instance)
+
                 builder.id("pumpkin.feature.${it.id}.$perm")
                         .description("Permission registered by feature ${it.id}".text())
                         .assign(PermissionDescription.ROLE_STAFF, true)
@@ -208,7 +213,14 @@ class Pumpkin {
             }
         }
 
-        log.debug("-> Reloaded ${mainConfig.enabledFeatures.size} features", "Pumpkin#reloadConfig()")
+        log.debug("-> Reloaded ${enabledFeatures.size} features (including dependencies).", "Pumpkin#reloadConfig()")
+
+        log.debug("Starting CacheCleaner.", "Pumpkin#reloadConfig()")
+        game.scheduler.createTaskBuilder()
+                .async()
+                .interval(1, TimeUnit.MINUTES)
+                .execute(cacheCleaner)
+                .submit(instance)
 
         log.info("Pumpkin was reloaded in ${System.currentTimeMillis() - startTime} ms.")
     }

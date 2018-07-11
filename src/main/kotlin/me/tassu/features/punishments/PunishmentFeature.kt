@@ -27,13 +27,13 @@ class PunishmentFeature : Feature {
     @Inject internal lateinit var banService: BanService
 
     override val listeners: List<Any> by lazy {
-        listOf(connectListener)
+        listOf<Any>(/*connectListener*/)
     }
 
     override fun enable() {
         enabled = true
 
-        Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
+        // Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
     }
 
     override fun disable() {
@@ -46,5 +46,5 @@ class PunishmentFeature : Feature {
 
     override val id: String = "punishments"
     override val permissions: List<String> = listOf()
-    override val dependencies: List<String> = listOf()
+    override val dependencies: List<String> = listOf("user_data")
 }

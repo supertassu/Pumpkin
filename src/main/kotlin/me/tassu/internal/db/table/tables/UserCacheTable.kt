@@ -49,33 +49,36 @@ class UserCacheTable : AbstractTable() {
         return getCurrentVersion()
     }
 
-    fun queryUserByUUID(uuid: UUID): UserData {
+    fun queryUserByUUID(uuid: UUID): UserData? {
         return databaseManager.getConnection().use {
             it.prepareStatement(nameReplacer.apply(QUERY_BY_UUID)).use { s ->
                 s.setString(1, uuid.toString())
                 s.executeQuery().use {
+                    if (!it.next()) return null
                     UserData(it.getString("name"), InetAddress.getByName(it.getString("ip")), UUID.fromString(it.getString("uuid")))
                 }
             }
         }
     }
 
-    fun queryUserByIp(ip: InetAddress): UserData {
+    fun queryUserByIp(ip: InetAddress): UserData? {
         return databaseManager.getConnection().use {
             it.prepareStatement(nameReplacer.apply(QUERY_BY_IP)).use { s ->
                 s.setString(1, ip.hostName)
                 s.executeQuery().use {
+                    if (!it.next()) return null
                     UserData(it.getString("name"), InetAddress.getByName(it.getString("ip")), UUID.fromString(it.getString("uuid")))
                 }
             }
         }
     }
 
-    fun queryUserByName(name: String): UserData {
+    fun queryUserByName(name: String): UserData? {
         return databaseManager.getConnection().use {
             it.prepareStatement(nameReplacer.apply(QUERY_BY_NAME)).use { s ->
                 s.setString(1, name)
                 s.executeQuery().use {
+                    if (!it.next()) return null
                     UserData(it.getString("name"), InetAddress.getByName(it.getString("ip")), UUID.fromString(it.getString("uuid")))
                 }
             }
@@ -90,6 +93,7 @@ class UserCacheTable : AbstractTable() {
                 s.setString(3, data.name)
                 s.setString(4, data.ip.hostAddress)
                 s.setString(5, data.name)
+                s.execute()
             }
         }
     }

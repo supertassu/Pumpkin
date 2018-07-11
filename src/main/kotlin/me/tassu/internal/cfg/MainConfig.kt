@@ -76,7 +76,7 @@ class MainConfig {
     var enabledCommands = listOf("gamemode")
 
     @Setting("enabled features", comment = "This array contains all enabled features.")
-    var enabledFeatures = listOf("chat")
+    var enabledFeatures = listOf("chat", "punishments")
 
     @Setting(comment = "Contains database configuration.")
     var database = DatabaseConfig()
