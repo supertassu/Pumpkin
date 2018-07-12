@@ -1,6 +1,7 @@
 package me.tassu
 
 import com.google.inject.Inject
+import com.google.inject.Injector
 import me.tassu.internal.di.PumpkinHolder
 import me.tassu.internal.di.PumpkinModule
 import org.spongepowered.api.Sponge
@@ -30,6 +31,10 @@ import java.nio.file.Path
 )
 class PumpkinLoader {
 
+    companion object {
+        lateinit var injector: Injector
+    }
+
     @Inject
     private lateinit var container: PluginContainer
 
@@ -40,12 +45,11 @@ class PumpkinLoader {
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun init(event: GameInitializationEvent) {
-        val pumpkin = Pumpkin()
-        val injector = PumpkinModule(container, pumpkin, configDir).createInjector()
-
-        injector.injectMembers(pumpkin)
+        val injector = PumpkinModule(container, configDir).createInjector()
+        PumpkinLoader.injector = injector
         injector.injectMembers(PumpkinHolder())
 
+        val pumpkin = injector.getInstance(Pumpkin::class.java)
         Sponge.getEventManager().registerListeners(this, pumpkin)
     }
 

@@ -12,7 +12,7 @@
     <!-- KOTLIN CONFIGURATION -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.2.50</kotlin.version>
+        <kotlin.version>1.2.51</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
@@ -189,11 +189,18 @@
             <version>4.2.0</version>
         </dependency>
 
+        <!-- SHADED DATABASE CONNECTORS -->
         <!-- hikaricp -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>3.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.11</version>
         </dependency>
 
         <!-- OPTIONAL DEPENDENCIES -->

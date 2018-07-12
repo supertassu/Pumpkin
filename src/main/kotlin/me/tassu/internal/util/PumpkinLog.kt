@@ -4,10 +4,12 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import me.tassu.Pumpkin
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.spongepowered.api.plugin.PluginContainer
 
 @Singleton
+/**
+ * Handles all logging for Pumpkin.
+ */
 class PumpkinLog {
 
     @Inject private lateinit var container: PluginContainer
