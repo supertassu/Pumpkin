@@ -9,9 +9,7 @@ import org.spongepowered.api.service.ban.BanService
 @Singleton
 class ConnectListener {
 
-    @Inject private lateinit var feature: PunishmentFeature
-
-    private val service: BanService get() = feature.banService
+    @Inject private lateinit var manager: PunishmentManager
 
     @Listener
     fun onConnect(event: ClientConnectionEvent.Login) {

@@ -11,24 +11,15 @@ import java.util.concurrent.TimeUnit
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
+import me.tassu.internal.feature.SimpleFeature
 import org.spongepowered.api.Game
 import java.net.InetAddress
 
 
 @Singleton
-class UserDataFeature : Feature {
+class UserDataFeature : SimpleFeature() {
 
     override val id: String = "user_data"
-
-    var enabled = false
-
-    override fun enable() {
-        enabled = true
-    }
-
-    override fun disable() {
-        enabled = false
-    }
 
     override val listeners: List<Any> = listOf()
     override val permissions: List<String> = listOf()

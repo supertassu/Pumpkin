@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import me.tassu.internal.api.prefix.PrefixProvider
 import me.tassu.internal.cfg.GeneralMessages
-import me.tassu.internal.feature.Feature
+import me.tassu.internal.feature.SimpleFeature
 import me.tassu.internal.util.kt.formatColoredMessage
 import me.tassu.internal.util.kt.string
 import org.spongepowered.api.Sponge
@@ -13,24 +13,19 @@ import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.message.MessageChannelEvent
 
 @Singleton
-class ChatFeature : Feature {
+class ChatFeature : SimpleFeature() {
 
     override val id: String = "chat"
 
     private lateinit var prefixProvider: PrefixProvider
     private lateinit var format: String
-    private var enabled: Boolean = false
 
     @Inject private lateinit var generalMessages: GeneralMessages
 
     override fun enable() {
-        enabled = true
+        super.enable()
         prefixProvider = Sponge.getServiceManager().provideUnchecked(PrefixProvider::class.java)
         format = generalMessages.chat.format
-    }
-
-    override fun disable() {
-        enabled = false
     }
 
     @Listener

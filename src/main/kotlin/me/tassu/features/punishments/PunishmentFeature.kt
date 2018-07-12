@@ -24,7 +24,7 @@ class PunishmentFeature : Feature {
 
     private var enabled: Boolean = false
 
-    @Inject internal lateinit var banService: BanService
+    @Inject private lateinit var banService: BanService
 
     override val listeners: List<Any> by lazy {
         listOf<Any>(connectListener)
@@ -33,14 +33,19 @@ class PunishmentFeature : Feature {
     override fun enable() {
         enabled = true
 
-        Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
+        logger.warn("BanService can not be enabled due to a bug in SpongeCommon.")
+        logger.warn("See: https://github.com/SpongePowered/SpongeCommon/issues/1990")
+        logger.warn("Other plugins can not create PumpkinBans, however the bans")
+        logger.warn("* created by any Pumpkin ways (commands etc) will work just fine.")
+        //Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
     }
 
     override fun disable() {
-        enabled = false
-
         if (Sponge.getServiceManager().provide(BanService::class.java).orElse(null) is PumpkinBanService) {
-            logger.warn("BanService can not be disabled due to limitations in Sponge API.")
+            logger.warn("PunishmentFeature can not be disabled due to limitations in Sponge API.")
+            logger.warn("Please re-start the server to disable it.")
+        } else {
+            enabled = false
         }
     }
 
