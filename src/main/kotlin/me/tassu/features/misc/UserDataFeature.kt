@@ -15,7 +15,6 @@ import me.tassu.internal.feature.SimpleFeature
 import org.spongepowered.api.Game
 import java.net.InetAddress
 
-
 @Singleton
 class UserDataFeature : SimpleFeature() {
 

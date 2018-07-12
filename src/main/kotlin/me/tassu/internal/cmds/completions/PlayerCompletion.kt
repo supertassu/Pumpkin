@@ -13,7 +13,7 @@ import kotlin.streams.toList
 class PlayerCompletion(key: String, private var useSender: Boolean) : CommandElement(key.text()) {
 
     override fun complete(src: CommandSource?, args: CommandArgs?, context: CommandContext?): MutableList<String> {
-        return game.server.onlinePlayers.stream().filter { (src as? Player)?.canSee(it) ?: true }.map { it.name }.toList().toMutableList()
+        return game.server.onlinePlayers.filter { (src as? Player)?.canSee(it) ?: true }.map { it.name }.toMutableList()
     }
 
     private val game: Game get() = Sponge.getGame()

@@ -31,10 +31,6 @@ import java.nio.file.Path
 )
 class PumpkinLoader {
 
-    companion object {
-        lateinit var injector: Injector
-    }
-
     @Inject
     private lateinit var container: PluginContainer
 
@@ -46,8 +42,8 @@ class PumpkinLoader {
     @Suppress("UNUSED_PARAMETER")
     fun init(event: GameInitializationEvent) {
         val injector = PumpkinModule(container, configDir).createInjector()
-        PumpkinLoader.injector = injector
         injector.injectMembers(PumpkinHolder())
+        PumpkinHolder.getInstance().injector = injector
 
         val pumpkin = injector.getInstance(Pumpkin::class.java)
         Sponge.getEventManager().registerListeners(this, pumpkin)

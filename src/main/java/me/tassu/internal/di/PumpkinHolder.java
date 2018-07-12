@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import me.tassu.internal.cfg.GeneralMessages;
 import me.tassu.internal.cfg.MainConfig;
+import org.spongepowered.api.plugin.PluginContainer;
 
 public class PumpkinHolder {
 
@@ -11,9 +12,11 @@ public class PumpkinHolder {
     public static PumpkinHolder getInstance() { return instance; }
     public PumpkinHolder() { instance = this; }
 
-    @Inject public Injector injector;
+    public Injector injector;
 
     @Inject public GeneralMessages messages;
     @Inject public MainConfig mainConfig;
+
+    @Inject public PluginContainer container;
 
 }

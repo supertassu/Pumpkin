@@ -35,12 +35,13 @@ interface Feature {
     /**
      * List of all permissions this module requires.
      * A prefix of `pumpkin.feature.(FEATURE ID).` will be added.
-     *
-     * Examples (feature name "example")
-     *  * `coke` -> `pumpkin.feature.example.coke`
-     *  * `fruit.banana` -> `pumpkin.feature.example.fruit.banana`
      */
     val permissions: List<String>
+
+    /**
+     * Used to override the prefix of the feature permissions.
+     */
+    val permissionPrefix: String
 
     /**
      * List of all other [Feature]s this module requires.

@@ -35,8 +35,9 @@ class PunishmentFeature : Feature {
 
         logger.warn("BanService can not be enabled due to a bug in SpongeCommon.")
         logger.warn("See: https://github.com/SpongePowered/SpongeCommon/issues/1990")
+        logger.warn("")
         logger.warn("Other plugins can not create PumpkinBans, however the bans")
-        logger.warn("* created by any Pumpkin ways (commands etc) will work just fine.")
+        logger.warn("created by any Pumpkin ways (commands etc) will work just fine.")
         //Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
     }
 
@@ -52,4 +53,7 @@ class PunishmentFeature : Feature {
     override val id: String = "punishments"
     override val permissions: List<String> = listOf()
     override val dependencies: List<String> = listOf("user_data")
+
+    override val permissionPrefix: String
+        get() = "feature.$id"
 }

@@ -124,27 +124,42 @@ class GeneralMessages {
         var usage = "&7This command is used like &2{{usage}}"
 
         @Setting
-        var args = "&7The value &2{{given}}&7 can not be converted to a &2{{expected}}&7."
-
-        @Setting
         var error = "NOPREFIX|&4(Pumpkin) &cThe following error happened whilst executing the command: &4{{error}}"
 
         @Setting
-        val gamemode = GameMode()
+        var gamemode = GameMode()
 
         @ConfigSerializable
         class GameMode {
             @Setting("msg self own")
             var setOwn = "&7Your game mode was set to &2{{mode}}&7."
 
-            @Setting("msg set other")
+            @Setting("msg self other")
             var setOther = "&7Game mode of &2{{target}}&7 was set to &2{{mode}}&7."
 
             @Setting("msg others own")
-            var otherSetOwn = "&2{{actor}} set own game mode to &2{{mode}}&7."
+            var otherSetOwn = "&2{{actor}}&7 set own game mode to &2{{mode}}&7."
 
             @Setting("msg others other")
             var otherSetOther = "&2{{actor}}&7 set game mode of &2{{target}}&7 to &2{{mode}}&7."
+        }
+
+        @Setting
+        var teleport = Teleport()
+
+        @ConfigSerializable
+        class Teleport {
+            @Setting("msg self self")
+            val teleportSelf = "&7Teleported to &2{{target}}&7."
+
+            @Setting("msg self other")
+            val teleportOther = "&7Teleported &2{{player}}&7 to &2{{target}}&7."
+
+            @Setting("msg other self")
+            val otherTeleportSelf = "&2{{actor}}&7 teleported themselves to &2{{target}}&7."
+
+            @Setting("msg other other")
+            val otherTeleportOther = "&2{{actor}}&7 teleported &2{{player}}&7 to &2{{target}}&7."
         }
     }
 
