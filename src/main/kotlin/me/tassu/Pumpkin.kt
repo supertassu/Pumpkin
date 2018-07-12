@@ -63,14 +63,15 @@ class Pumpkin {
 
                 // commands
                 "cmd_gamemode" to commands.gameModeCommand,
-                "cmd_teleport" to commands.teleportCommand
+                "cmd_teleport" to commands.teleportCommand,
+                "cmd_pumpkin" to commands.pumpkinCommand
         )
     }
 
     @get:JvmName("isDebuggingEnabled") var debug: Boolean = true
 
     @get:JvmName("getVersion")
-    private val version: String get() = PumpkinLoader::class.java.annotations
+    val version: String get() = PumpkinLoader::class.java.annotations
             .filterIsInstance(Plugin::class.java)
             .first()
             .version

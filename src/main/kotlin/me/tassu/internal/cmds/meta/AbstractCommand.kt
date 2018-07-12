@@ -19,7 +19,7 @@ import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.text.Text
 import java.lang.IllegalArgumentException
 
-abstract class PumpkinCommand(private val display: String, private vararg val names: String) : SimpleFeature(), CommandExecutor {
+abstract class AbstractCommand(private val display: String, private vararg val names: String) : SimpleFeature(), CommandExecutor {
 
     protected val generalMessages: GeneralMessages get() = PumpkinHolder.getInstance().messages
 
@@ -41,8 +41,6 @@ abstract class PumpkinCommand(private val display: String, private vararg val na
     override fun enable() {
         super.enable()
 
-        println("$display -> (${names.size}) ${names.joinToString()}")
-
         val spec = CommandSpec.builder()
                 .description(Text.of(display))
                 .arguments(*arguments)
@@ -63,9 +61,9 @@ abstract class PumpkinCommand(private val display: String, private vararg val na
             result = executeCommand(src, args!!)
         } catch (e: Exception) {
             when (e) {
-                is PermissionCommandException -> src!!.sendColoredMessage(generalMessages.commands.noPerms, "perm" to e.permission)
-                is InternalCommandException -> src!!.sendColoredMessage(generalMessages.commands.error, "error" to e.friendlyMessage)
-                is InvalidUsageException -> src!!.sendColoredMessage(generalMessages.commands.usage, "usage" to e.usage)
+                is PermissionCommandException -> src!!.sendColoredMessage(generalMessages.commands.meta.noPerms, "perm" to e.permission)
+                is InternalCommandException -> src!!.sendColoredMessage(generalMessages.commands.meta.error, "error" to e.friendlyMessage)
+                is InvalidUsageException -> src!!.sendColoredMessage(generalMessages.commands.meta.usage, "usage" to e.usage)
                 else -> throw e
             }
 

@@ -19,4 +19,7 @@ abstract class SimpleFeature : Feature {
     override val permissionPrefix: String
     get() = "feature.$id"
 
+    override val isEnabled: Boolean
+        get() = enabled
+
 }

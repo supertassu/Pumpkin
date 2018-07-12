@@ -50,6 +50,9 @@ class PunishmentFeature : Feature {
         }
     }
 
+    override val isEnabled: Boolean
+        get() = enabled
+
     override val id: String = "punishments"
     override val permissions: List<String> = listOf()
     override val dependencies: List<String> = listOf("user_data")

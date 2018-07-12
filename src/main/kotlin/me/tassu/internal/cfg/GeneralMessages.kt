@@ -117,14 +117,20 @@ class GeneralMessages {
 
     @ConfigSerializable
     class CommandMessages {
-        @Setting("no permissions")
-        var noPerms = "&7You do not have the required permission (&2{{perm}}&7) to execute this command."
-
         @Setting
-        var usage = "&7This command is used like &2{{usage}}"
+        var meta = Meta()
 
-        @Setting
-        var error = "NOPREFIX|&4(Pumpkin) &cThe following error happened whilst executing the command: &4{{error}}"
+        @ConfigSerializable
+        class Meta {
+            @Setting("no permissions")
+            var noPerms = "&7You do not have the required permission (&2{{perm}}&7) to execute this command."
+
+            @Setting
+            var usage = "&7This command is used like &2{{usage}}"
+
+            @Setting
+            var error = "NOPREFIX|&4(Pumpkin) &cThe following error happened whilst executing the command: &4{{error}}"
+        }
 
         @Setting
         var gamemode = GameMode()
@@ -150,17 +156,25 @@ class GeneralMessages {
         @ConfigSerializable
         class Teleport {
             @Setting("msg self self")
-            val teleportSelf = "&7Teleported to &2{{target}}&7."
+            var teleportSelf = "&7Teleported to &2{{target}}&7."
 
             @Setting("msg self other")
-            val teleportOther = "&7Teleported &2{{player}}&7 to &2{{target}}&7."
+            var teleportOther = "&7Teleported &2{{player}}&7 to &2{{target}}&7."
 
             @Setting("msg other self")
-            val otherTeleportSelf = "&2{{actor}}&7 teleported themselves to &2{{target}}&7."
+            var otherTeleportSelf = "&2{{actor}}&7 teleported themselves to &2{{target}}&7."
 
             @Setting("msg other other")
-            val otherTeleportOther = "&2{{actor}}&7 teleported &2{{player}}&7 to &2{{target}}&7."
+            var otherTeleportOther = "&2{{actor}}&7 teleported &2{{player}}&7 to &2{{target}}&7."
         }
+
+        @Setting
+        val pumpkin = listOf(
+                "NOPREFIX| &aPUMPKIN &aver. {{version}}",
+                "NOPREFIX| &7* &aEnabled modules: &7{{enabled modules}}",
+                "NOPREFIX| &7* &aDisabled modules: &7{{disabled modules}}"
+        )
+
     }
 
 }

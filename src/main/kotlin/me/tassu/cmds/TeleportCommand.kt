@@ -3,20 +3,16 @@ package me.tassu.cmds
 import me.tassu.internal.cmds.completions.PlayerCompletion
 import me.tassu.internal.cmds.completions.PossibleContainer
 import me.tassu.internal.cmds.ex.InvalidUsageException
-import me.tassu.internal.cmds.meta.PumpkinCommand
+import me.tassu.internal.cmds.meta.AbstractCommand
 import me.tassu.internal.util.kt.*
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.args.CommandElement
 import org.spongepowered.api.command.args.GenericArguments
-import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.plugin.PluginContainer
-import org.spongepowered.api.text.Text
 
-class TeleportCommand : PumpkinCommand("Teleport", "teleport", "tp") {
+class TeleportCommand : AbstractCommand("Teleport", "teleport", "tp") {
 
     override val arguments: Array<CommandElement> = arrayOf(
             GenericArguments.onlyOne(GenericArguments.optional(PlayerCompletion("player", true))),

@@ -21,6 +21,8 @@ interface Feature {
      */
     fun disable()
 
+    val isEnabled: Boolean
+
     /**
      * Called by the cache cleaner every minute.
      */

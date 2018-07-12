@@ -4,7 +4,7 @@ import me.tassu.internal.cmds.completions.GameModeCompletion
 import me.tassu.internal.cmds.completions.PlayerCompletion
 import me.tassu.internal.cmds.completions.PossibleContainer
 import me.tassu.internal.cmds.ex.InvalidUsageException
-import me.tassu.internal.cmds.meta.PumpkinCommand
+import me.tassu.internal.cmds.meta.AbstractCommand
 import me.tassu.internal.util.kt.formatColoredMessage
 import me.tassu.internal.util.kt.getAllMessageReceiversWithPermission
 import me.tassu.internal.util.kt.sendColoredMessage
@@ -17,7 +17,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 
-class GamemodeCommand : PumpkinCommand("Game mode", "gamemode", "gm") {
+class GamemodeCommand : AbstractCommand("Game mode", "gamemode", "gm") {
 
     override fun executeCommand(src: CommandSource, args: CommandContext): CommandResult {
         val rawPlayer = args.getOne<PossibleContainer<Player>>("player")
