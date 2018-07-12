@@ -2,6 +2,7 @@ package me.tassu.features.punishments
 
 import org.spongepowered.api.util.ban.BanType
 import org.spongepowered.api.util.ban.BanTypes
+import java.lang.IllegalArgumentException
 import java.net.InetAddress
 import java.sql.ResultSet
 import java.util.*

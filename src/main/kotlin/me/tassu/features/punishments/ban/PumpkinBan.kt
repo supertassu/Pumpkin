@@ -18,7 +18,7 @@ import java.sql.ResultSet
 import java.time.Instant
 import java.util.*
 
-abstract class PumpkinBan(resultSet: ResultSet) : AbstractPunishment(resultSet), Ban {
+abstract class PumpkinBan(data: ResultSet) : AbstractPunishment(data), Ban {
 
     override val type: PunishmentType = PunishmentType.BAN
 
@@ -55,8 +55,8 @@ abstract class PumpkinBan(resultSet: ResultSet) : AbstractPunishment(resultSet),
     }
 
     init {
-        if (resultSet.getString("type") != "ban") {
-            throw IllegalArgumentException("FAIL: Punishment type ${resultSet.getString("type")} is not a ban.")
+        if (data.getString("type") != "ban") {
+            throw IllegalArgumentException("FAIL: Punishment type ${data.getString("type")} is not a ban.")
         }
     }
 

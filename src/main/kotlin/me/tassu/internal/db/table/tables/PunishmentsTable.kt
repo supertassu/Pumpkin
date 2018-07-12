@@ -44,7 +44,7 @@ class PunishmentsTable : AbstractTable() {
 
         private const val QUERY_EVERYTHING_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME;"
 
-        private const val QUERY_EVERYTHING_BY_TYPE_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE target_type='?';"
+        private const val QUERY_EVERYTHING_BY_TYPE_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE target_type=?;"
     }
 
     private val nameReplacer = Function<String, String> {
