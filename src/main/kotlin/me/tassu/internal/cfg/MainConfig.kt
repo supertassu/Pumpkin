@@ -29,6 +29,25 @@ class MainConfig {
     fun save() {
         try {
             val out = SimpleCommentedConfigurationNode.root()
+            out.setComment("""
+                  ____  __ __ ___  ___ ____  __ __ __ __  __
+                  || \\ || || ||\\//|| || \\ || // || ||\ ||
+                  ||_// || || || \/ || ||_// ||<<  || ||\\||
+                  ||    \\_// ||    || ||    || \\ || || \||
+
+                    This is the main configuration file
+                    of Pumpkin, the powerful server core plugin.
+
+                    TASSU ==========
+                    https://tassu.me
+                    pumpkin@tassu.me
+
+
+                    Prefix a string with "NOPREFIX|" to make the prefix not appear before the message.
+
+                    This configuration file uses the Human-Optimized Config Object Notation (HOCON) for formatting.
+                    Learn more at https://github.com/lightbend/config/blob/master/HOCON.md
+            """.trimIndent())
             this.configMapper.serialize(out)
             this.loader.save(out)
         } catch (e: ObjectMappingException) {
@@ -57,7 +76,7 @@ class MainConfig {
     var enabledCommands = listOf("gamemode")
 
     @Setting("enabled features", comment = "This array contains all enabled features.")
-    var enabledFeatures = listOf("chat")
+    var enabledFeatures = listOf("chat", "punishments")
 
     @Setting(comment = "Contains database configuration.")
     var database = DatabaseConfig()
@@ -66,7 +85,7 @@ class MainConfig {
     class DatabaseConfig {
 
         @Setting
-        var type = DatabaseType.MARIADB
+        var type = DatabaseType.MYSQL
 
         @Setting
         var host = "localhost"
@@ -82,6 +101,9 @@ class MainConfig {
 
         @Setting
         var database = "minecraft"
+
+        @Setting("table prefix")
+        var tablePrefix = "pumpkin_"
 
     }
 

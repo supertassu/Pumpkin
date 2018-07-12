@@ -3,6 +3,8 @@ package me.tassu.internal.db
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import me.tassu.internal.cfg.MainConfig
+import me.tassu.internal.db.table.TableManager
+import me.tassu.internal.di.PumpkinHolder
 import me.tassu.internal.util.PumpkinLog
 import java.sql.Connection
 
@@ -11,6 +13,10 @@ class DatabaseManager {
 
     @Inject private lateinit var mainConfig: MainConfig
     @Inject private lateinit var log: PumpkinLog
+
+    @Inject private lateinit var tableManager: TableManager
+
+    lateinit var tablePrefix: String
 
     private var connected = false
     private val type: DatabaseType get() = mainConfig.database.type
@@ -24,8 +30,14 @@ class DatabaseManager {
             throw IllegalStateException("Already connected.")
         }
 
+        tablePrefix = mainConfig.database.tablePrefix
+
         connector = type.clazz.newInstance()
+        PumpkinHolder.getInstance().injector.injectMembers(connector)
         connector.connect(mainConfig.database)
+
+        tableManager.init()
+
         connected = true
     }
 

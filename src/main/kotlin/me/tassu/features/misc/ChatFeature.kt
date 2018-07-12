@@ -1,9 +1,10 @@
-package me.tassu.features.chat
+package me.tassu.features.misc
 
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import me.tassu.internal.api.prefix.PrefixProvider
 import me.tassu.internal.cfg.GeneralMessages
-import me.tassu.internal.feature.Feature
+import me.tassu.internal.feature.SimpleFeature
 import me.tassu.internal.util.kt.formatColoredMessage
 import me.tassu.internal.util.kt.string
 import org.spongepowered.api.Sponge
@@ -11,16 +12,25 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.message.MessageChannelEvent
 
-class ChatListener {
+@Singleton
+class ChatFeature : SimpleFeature() {
 
-    @Inject private lateinit var module: ChatModule
+    override val id: String = "chat"
 
-    internal lateinit var prefixProvider: PrefixProvider
-    internal lateinit var format: String
+    private lateinit var prefixProvider: PrefixProvider
+    private lateinit var format: String
+
+    @Inject private lateinit var generalMessages: GeneralMessages
+
+    override fun enable() {
+        super.enable()
+        prefixProvider = Sponge.getServiceManager().provideUnchecked(PrefixProvider::class.java)
+        format = generalMessages.chat.format
+    }
 
     @Listener
     fun onChat(event: MessageChannelEvent.Chat) {
-        if (!module.enabled) return
+        if (!enabled) return
 
         val player = event.cause.first(Player::class.java).get()
 
@@ -35,7 +45,10 @@ class ChatListener {
                 "user_prefix" to prefix,
                 "user_suffix" to suffix,
                 "user_name" to player.name,
-                "text" to rawMessage.replace("&", "")))
+                "text" to rawMessage.replace("&", "&\\")))
     }
 
+    override val listeners: List<Any> = listOf()
+    override val permissions: List<String> = listOf("color")
+    override val dependencies: List<String> = listOf()
 }

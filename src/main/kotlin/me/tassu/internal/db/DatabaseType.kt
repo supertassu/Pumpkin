@@ -1,9 +1,12 @@
 package me.tassu.internal.db
 
-import me.tassu.internal.db.hikari.MariaDbConnector
+import me.tassu.internal.db.hikari.MySqlConnector
 
+/**
+ * All database types.
+ */
 enum class DatabaseType(val clazz: Class<out IDatabaseConnector>) {
 
-    MARIADB(MariaDbConnector::class.java);
+    MYSQL(MySqlConnector::class.java);
 
 }
