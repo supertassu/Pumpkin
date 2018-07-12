@@ -169,11 +169,20 @@ class GeneralMessages {
         }
 
         @Setting
-        val pumpkin = listOf(
-                "NOPREFIX| &aPUMPKIN &aver. {{version}}",
-                "NOPREFIX| &7* &aEnabled modules: &7{{enabled modules}}",
-                "NOPREFIX| &7* &aDisabled modules: &7{{disabled modules}}"
-        )
+        var pumpkin = Pumpkin()
+
+        @ConfigSerializable
+        class Pumpkin {
+            @Setting
+            var fallback = listOf(
+                    "NOPREFIX| &aPUMPKIN &aver. {{version}}",
+                    "NOPREFIX| &7* &aEnabled modules: &7{{enabled modules}}",
+                    "NOPREFIX| &7* &aDisabled modules: &7{{disabled modules}}"
+            )
+
+            @Setting
+            var reloaded = "Successfully reloaded. See console for more details."
+        }
 
     }
 

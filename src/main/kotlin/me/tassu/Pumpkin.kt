@@ -154,7 +154,7 @@ class Pumpkin {
 
     @Listener
     @Suppress("UNUSED_PARAMETER")
-    fun reload(event: GameReloadEvent) {
+    fun reload(event: GameReloadEvent?) {
         val timer = System.currentTimeMillis()
         log.info("§aReloading Pumpkin...")
         reloadConfig()
