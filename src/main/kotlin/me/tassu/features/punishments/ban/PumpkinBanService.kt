@@ -71,6 +71,7 @@ class PumpkinBanService : BanService {
                 .getAllPunishments(BanTypes.IP)
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Ip }
+                .map { it.asSponge() }
                 .toMutableSet()
     }
 
@@ -86,6 +87,7 @@ class PumpkinBanService : BanService {
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Uuid }
                 .first { it.hasNotExpired() }
+                .asSponge()
                 .toOptional()
     }
 
@@ -101,6 +103,7 @@ class PumpkinBanService : BanService {
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Ip }
                 .first { it.hasNotExpired() }
+                .asSponge()
                 .toOptional()
     }
 
@@ -114,6 +117,7 @@ class PumpkinBanService : BanService {
                 .getAllPunishments()
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan }
+                .map { it.asSponge() }
                 .toMutableSet()
     }
 
@@ -172,6 +176,7 @@ class PumpkinBanService : BanService {
                 .getAllPunishments(BanTypes.PROFILE)
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Uuid }
+                .map { it.asSponge() }
                 .toMutableSet()
     }
 }

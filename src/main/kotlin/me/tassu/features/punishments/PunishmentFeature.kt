@@ -5,9 +5,9 @@ import com.google.inject.Singleton
 import me.tassu.features.punishments.ban.PumpkinBanService
 import me.tassu.internal.feature.Feature
 import me.tassu.internal.util.PumpkinLog
-import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.service.ban.BanService
 import java.util.*
 
 @Singleton
@@ -17,14 +17,18 @@ class PunishmentFeature : Feature {
         val CONSOLE_UUID: UUID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
     }
 
-    @Inject private lateinit var connectListener: ConnectListener
-    @Inject private lateinit var container: PluginContainer
+    @Inject
+    private lateinit var connectListener: ConnectListener
+    @Inject
+    private lateinit var container: PluginContainer
 
-    @Inject private lateinit var logger: PumpkinLog
+    @Inject
+    private lateinit var logger: PumpkinLog
 
     private var enabled: Boolean = false
 
-    @Inject private lateinit var banService: BanService
+    @Inject
+    private lateinit var banService: BanService
 
     override val listeners: List<Any> by lazy {
         listOf<Any>(connectListener)
@@ -33,12 +37,7 @@ class PunishmentFeature : Feature {
     override fun enable() {
         enabled = true
 
-        logger.warn("BanService can not be enabled due to a bug in SpongeCommon.")
-        logger.warn("See: https://github.com/SpongePowered/SpongeCommon/issues/1990")
-        logger.warn("")
-        logger.warn("Other plugins can not create PumpkinBans, however the bans")
-        logger.warn("created by any Pumpkin ways (commands etc) will work just fine.")
-        //Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
+        Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
     }
 
     override fun disable() {
