@@ -3,7 +3,7 @@ package me.tassu.features.punishments.ban
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import me.tassu.features.punishments.PunishmentManager
-import me.tassu.features.punishments.PunishmentType
+import me.tassu.features.punishments.punishment.PunishmentType
 import me.tassu.internal.util.kt.toOptional
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.service.ban.BanService
@@ -71,6 +71,7 @@ class PumpkinBanService : BanService {
                 .getAllPunishments(BanTypes.IP)
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Ip }
+                .map { it.asSponge() }
                 .toMutableSet()
     }
 
@@ -81,12 +82,13 @@ class PumpkinBanService : BanService {
      * @return The ban, if available
      */
     override fun getBanFor(profile: GameProfile): Optional<Ban.Profile> {
-        return punishmentManager
+        val ban = punishmentManager
                 .getPunishmentsForUser(profile.uniqueId)
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Uuid }
-                .first { it.hasNotExpired() }
-                .toOptional()
+                .firstOrNull { it.hasNotExpired() } ?: return Optional.empty()
+
+        return ban.asSponge().toOptional()
     }
 
     /**
@@ -96,12 +98,13 @@ class PumpkinBanService : BanService {
      * @return All registered IP bans
      */
     override fun getBanFor(address: InetAddress?): Optional<Ban.Ip> {
-        return punishmentManager
+        val ban = punishmentManager
                 .getPunishmentsForIp(address!!)
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Ip }
-                .first { it.hasNotExpired() }
-                .toOptional()
+                .firstOrNull { it.hasNotExpired() } ?: return Optional.empty()
+
+        return ban.asSponge().toOptional()
     }
 
     /**
@@ -114,18 +117,35 @@ class PumpkinBanService : BanService {
                 .getAllPunishments()
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan }
+                .map { it.asSponge() }
                 .toMutableSet()
     }
 
     /**
-     * Removes a ban.
+     * Removes a spongeBan.
      *
-     * @param ban The ban
-     * @return Whether the ban was present in this ban service
-     * @todo IMPLEMENT
+     * @param spongeBan The spongeBan
+     * @return Whether the spongeBan was present in this spongeBan service
      */
-    override fun removeBan(ban: Ban?): Boolean {
-        return false
+    override fun removeBan(spongeBan: Ban?): Boolean {
+        if (spongeBan == null) return false
+
+        val ban = when (spongeBan) {
+            is Ban.Profile -> punishmentManager
+                    .getPunishmentsForUser(spongeBan.profile.uniqueId)
+                    .filter { it.type == PunishmentType.BAN }
+                    .map { it as PumpkinBan.Uuid }
+                    .firstOrNull { it.hasNotExpired() }
+            is Ban.Ip -> punishmentManager
+                    .getPunishmentsForIp(spongeBan.address)
+                    .filter { it.type == PunishmentType.BAN }
+                    .map { it as PumpkinBan.Ip }
+                    .firstOrNull { it.hasNotExpired() }
+            else -> return false
+        } ?: return false
+
+        punishmentManager.revokePunishment(ban)
+        return true
     }
 
     /**
@@ -145,10 +165,23 @@ class PumpkinBanService : BanService {
      *
      * @param profile The profile
      * @return Whether the profile had a ban present
-     * @todo Implement
      */
     override fun pardon(profile: GameProfile?): Boolean {
-        return false
+        if (profile == null) return false
+
+        val rawBan = punishmentManager
+                .getPunishmentsForUser(profile.uniqueId)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan.Uuid }
+                .firstOrNull { it.hasNotExpired() }
+                .toOptional()
+
+        if (!rawBan.isPresent) return false
+        val ban = rawBan.get()
+
+        punishmentManager.revokePunishment(ban)
+
+        return true
     }
 
     /**
@@ -156,10 +189,23 @@ class PumpkinBanService : BanService {
      *
      * @param address The IP address
      * @return Whether the address had a ban present
-     * @todo Implement
      */
     override fun pardon(address: InetAddress?): Boolean {
-        return false
+        if (address == null) return false
+
+        val rawBan = punishmentManager
+                .getPunishmentsForIp(address)
+                .filter { it.type == PunishmentType.BAN }
+                .map { it as PumpkinBan.Uuid }
+                .firstOrNull { it.hasNotExpired() }
+                .toOptional()
+
+        if (!rawBan.isPresent) return false
+        val ban = rawBan.get()
+
+        punishmentManager.revokePunishment(ban)
+
+        return true
     }
 
     /**
@@ -172,6 +218,7 @@ class PumpkinBanService : BanService {
                 .getAllPunishments(BanTypes.PROFILE)
                 .filter { it.type == PunishmentType.BAN }
                 .map { it as PumpkinBan.Uuid }
+                .map { it.asSponge() }
                 .toMutableSet()
     }
 }

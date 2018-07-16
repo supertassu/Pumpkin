@@ -1,4 +1,4 @@
-package me.tassu.features.punishments
+package me.tassu.features.punishments.punishment
 
 enum class PunishmentType {
 

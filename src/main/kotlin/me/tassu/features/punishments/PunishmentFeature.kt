@@ -3,11 +3,15 @@ package me.tassu.features.punishments
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import me.tassu.features.punishments.ban.PumpkinBanService
+import me.tassu.features.punishments.cmd.BanCommand
+import me.tassu.features.punishments.cmd.PardonCommand
+import me.tassu.features.punishments.listener.ConnectListener
+import me.tassu.internal.cmds.meta.AbstractCommand
 import me.tassu.internal.feature.Feature
 import me.tassu.internal.util.PumpkinLog
-import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.service.ban.BanService
 import java.util.*
 
 @Singleton
@@ -17,28 +21,41 @@ class PunishmentFeature : Feature {
         val CONSOLE_UUID: UUID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
     }
 
-    @Inject private lateinit var connectListener: ConnectListener
-    @Inject private lateinit var container: PluginContainer
+    @Inject
+    private lateinit var connectListener: ConnectListener
+    @Inject
+    private lateinit var container: PluginContainer
 
-    @Inject private lateinit var logger: PumpkinLog
+    @Inject
+    private lateinit var logger: PumpkinLog
 
     private var enabled: Boolean = false
 
-    @Inject private lateinit var banService: BanService
+    @Inject
+    private lateinit var banService: BanService
 
     override val listeners: List<Any> by lazy {
         listOf<Any>(connectListener)
     }
 
+    @Inject private lateinit var banCommand: BanCommand
+    @Inject private lateinit var pardonCommand: PardonCommand
+
+    private val commands: List<AbstractCommand> by lazy {
+        listOf(
+                banCommand,
+                pardonCommand
+        )
+    }
+
     override fun enable() {
         enabled = true
 
-        logger.warn("BanService can not be enabled due to a bug in SpongeCommon.")
-        logger.warn("See: https://github.com/SpongePowered/SpongeCommon/issues/1990")
-        logger.warn("")
-        logger.warn("Other plugins can not create PumpkinBans, however the bans")
-        logger.warn("created by any Pumpkin ways (commands etc) will work just fine.")
-        //Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
+        commands.forEach {
+            it.enable()
+        }
+
+        Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
     }
 
     override fun disable() {
@@ -46,6 +63,10 @@ class PunishmentFeature : Feature {
             logger.warn("PunishmentFeature can not be disabled due to limitations in Sponge API.")
             logger.warn("Please re-start the server to disable it.")
         } else {
+            commands.forEach {
+                it.disable()
+            }
+
             enabled = false
         }
     }
@@ -54,9 +75,20 @@ class PunishmentFeature : Feature {
         get() = enabled
 
     override val id: String = "punishments"
-    override val permissions: List<String> = listOf()
-    override val dependencies: List<String> = listOf("user_data")
 
+    override val permissions: List<String> by lazy {
+        val list = mutableListOf<String>()
+
+        commands.forEach {
+            it.permissions.forEach { perm ->
+                list.add("commands.${it.name}." + perm)
+            }
+        }
+
+        list
+    }
+
+    override val dependencies: List<String> = listOf("user_data")
     override val permissionPrefix: String
         get() = "feature.$id"
 }

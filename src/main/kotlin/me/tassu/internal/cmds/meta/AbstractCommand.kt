@@ -54,8 +54,8 @@ abstract class AbstractCommand(private val display: String, private vararg val n
         val result: CommandResult
 
         try {
-            if (!src!!.hasPermission("pumpkin.command.$name.execute")) {
-                throw PermissionCommandException("pumpkin.command.$name.execute")
+            if (!src!!.hasPermission("pumpkin.$permissionPrefix.execute")) {
+                throw PermissionCommandException("pumpkin.$permissionPrefix.execute")
             }
 
             result = executeCommand(src, args!!)

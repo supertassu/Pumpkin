@@ -204,4 +204,41 @@ class GeneralMessages {
 
     }
 
+    @Setting
+    val punishments = Punishments()
+
+    @ConfigSerializable
+    class Punishments {
+
+        @Setting
+        val commands = Commands()
+
+        @ConfigSerializable
+        class Commands {
+
+            @Setting("pardon no such ban")
+            val pardonBanNotFound = "&7No bans were found for &2{{target}}&7."
+
+            @Setting("pardon msg to self")
+            val pardonedSelf = "&2{{target}}&7 was pardoned due to &2{{reason}}&7."
+
+            @Setting("pardon msg to others")
+            val pardonedOther = "&2{{target}}&7 was pardoned by &2{{actor}}&7 due to &2{{reason}}&7."
+
+            @Setting
+            val alreadyBanned = "&7The user &2{{target}}&7 is already banned for &2{{reason}}&7."
+
+            @Setting("permaban msg to self")
+            val bannedSelf = "&2{{target}}&7 was permanently banned due to &2{{reason}}&7."
+
+            @Setting("permaban msg to others")
+            val bannedOther = "&2{{target}}&7 was permanently banned by &2{{actor}}&7 due to &2{{reason}}&7."
+
+        }
+
+        @Setting("msg to perma banned")
+        val permaBannedMsg = "NOPREFIX| &cBANNED BY &4{{actor}}\n&7&o{{reason}}"
+
+    }
+
 }

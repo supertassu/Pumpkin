@@ -1,9 +1,11 @@
-package me.tassu.features.punishments
+package me.tassu.features.punishments.punishment
 
 import java.net.InetAddress
 import java.util.*
 
 interface Punishment {
+
+    val id: Int
 
     val type: PunishmentType
     val actor: UUID
