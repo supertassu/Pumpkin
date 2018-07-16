@@ -1,5 +1,6 @@
 package me.tassu.cmds
 
+import com.google.inject.Singleton
 import me.tassu.internal.cmds.completions.PlayerCompletion
 import me.tassu.internal.cmds.completions.PossibleContainer
 import me.tassu.internal.cmds.ex.InvalidUsageException
@@ -12,6 +13,7 @@ import org.spongepowered.api.command.args.CommandElement
 import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.entity.living.player.Player
 
+@Singleton
 class TeleportCommand : AbstractCommand("Teleport", "teleport", "tp") {
 
     override val arguments: Array<CommandElement> = arrayOf(

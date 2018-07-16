@@ -169,6 +169,24 @@ class GeneralMessages {
         }
 
         @Setting
+        val fly = Fly()
+
+        @ConfigSerializable
+        class Fly {
+            @Setting("msg self own")
+            var setOwn = "&7Your flight mode was set to &2{{mode}}&7."
+
+            @Setting("msg self other")
+            var setOther = "&7Flight mode of &2{{target}}&7 was set to &2{{mode}}&7."
+
+            @Setting("msg others own")
+            var otherSetOwn = "&2{{actor}}&7 set own flight mode to &2{{mode}}&7."
+
+            @Setting("msg others other")
+            var otherSetOther = "&2{{actor}}&7 set flight mode of &2{{target}}&7 to &2{{mode}}&7."
+        }
+
+        @Setting
         var pumpkin = Pumpkin()
 
         @ConfigSerializable
