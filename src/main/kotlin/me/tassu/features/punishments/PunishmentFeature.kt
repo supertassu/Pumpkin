@@ -3,6 +3,7 @@ package me.tassu.features.punishments
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import me.tassu.features.punishments.ban.PumpkinBanService
+import me.tassu.features.punishments.cmd.BanCommand
 import me.tassu.features.punishments.cmd.PardonCommand
 import me.tassu.features.punishments.listener.ConnectListener
 import me.tassu.internal.cmds.meta.AbstractCommand
@@ -37,10 +38,12 @@ class PunishmentFeature : Feature {
         listOf<Any>(connectListener)
     }
 
+    @Inject private lateinit var banCommand: BanCommand
     @Inject private lateinit var pardonCommand: PardonCommand
 
     private val commands: List<AbstractCommand> by lazy {
         listOf(
+                banCommand,
                 pardonCommand
         )
     }
@@ -48,7 +51,9 @@ class PunishmentFeature : Feature {
     override fun enable() {
         enabled = true
 
-        pardonCommand.enable()
+        commands.forEach {
+            it.enable()
+        }
 
         Sponge.getServiceManager().setProvider(container, BanService::class.java, banService)
     }
@@ -58,7 +63,9 @@ class PunishmentFeature : Feature {
             logger.warn("PunishmentFeature can not be disabled due to limitations in Sponge API.")
             logger.warn("Please re-start the server to disable it.")
         } else {
-            pardonCommand.disable()
+            commands.forEach {
+                it.disable()
+            }
 
             enabled = false
         }
@@ -74,7 +81,7 @@ class PunishmentFeature : Feature {
 
         commands.forEach {
             it.permissions.forEach { perm ->
-                list.add(it.permissionPrefix + "." + perm)
+                list.add("commands.${it.name}." + perm)
             }
         }
 
@@ -82,7 +89,6 @@ class PunishmentFeature : Feature {
     }
 
     override val dependencies: List<String> = listOf("user_data")
-
     override val permissionPrefix: String
         get() = "feature.$id"
 }

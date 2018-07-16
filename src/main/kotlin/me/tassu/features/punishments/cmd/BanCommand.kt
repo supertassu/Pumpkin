@@ -22,7 +22,7 @@ import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.plugin.PluginContainer
 
 @Singleton
-class PardonCommand : AbstractCommand("Pardon", "pardon", "unban") {
+class BanCommand : AbstractCommand("ban", "ban", "banana") {
     override val arguments: Array<CommandElement> = arrayOf(
             GenericArguments.onlyOne(GenericArguments.optional(GenericArguments.user("target".text()))),
             GenericArguments.optional(GenericArguments.remainingJoinedStrings("reason".text()))
@@ -36,13 +36,13 @@ class PardonCommand : AbstractCommand("Pardon", "pardon", "unban") {
         val rawReason = args.getOne<String>("reason")
 
         if (!rawTarget.isPresent) {
-            throw InvalidUsageException("/pardon <user> [reason]")
+            throw InvalidUsageException("/ban <user> [reason]")
         }
 
-        val reason = if (rawReason.isPresent) rawReason.get() else "Punishment revoked by an operator"
+        val reason = if (rawReason.isPresent) rawReason.get() else "Banned by an operator"
         val target = rawTarget.get()
 
-        val uuid = if (src is Player) {
+        val actor = if (src is Player) {
             src.uniqueId
         } else {
             PunishmentFeature.CONSOLE_UUID
@@ -50,7 +50,7 @@ class PardonCommand : AbstractCommand("Pardon", "pardon", "unban") {
 
         game.scheduler.createTaskBuilder()
                 .delayTicks(1)
-                .name("/pardon command executor")
+                .name("/ban command executor")
                 .async()
                 .execute { _ ->
                     val ban = punishmentManager
@@ -59,24 +59,33 @@ class PardonCommand : AbstractCommand("Pardon", "pardon", "unban") {
                             .map { it as PumpkinBan.Uuid }
                             .firstOrNull { it.hasNotExpired() }
 
-                    if (ban == null) {
-                        src.sendColoredMessage(generalMessages.punishments.commands.pardonBanNotFound,
-                                "target" to target.name)
+                    if (ban != null) {
+                        src.sendColoredMessage(generalMessages.punishments.commands.alreadyBanned,
+                                "target" to target.name,
+                                "reason" to ban.reason
+                        )
                         return@execute
                     }
 
-                    punishmentManager.revokePunishment(ban, reason, uuid)
+                    punishmentManager.banUser(target.uniqueId, actor, reason, null)
 
-                    src.sendColoredMessage(generalMessages.punishments.commands.pardonedSelf,
+                    val online = game.server.getPlayer(target.uniqueId)
+
+                    if (online.isPresent) {
+                        online.get().kick(generalMessages.punishments.permaBannedMsg.formatColoredMessage(
+                                "actor" to src.name, "reason" to reason).text())
+                    }
+
+                    src.sendColoredMessage(generalMessages.punishments.commands.bannedSelf,
                             "target" to target.name,
                             "reason" to reason)
 
-                    val message = generalMessages.punishments.commands.pardonedOther.formatColoredMessage(
+                    val message = generalMessages.punishments.commands.bannedOther.formatColoredMessage(
                             "actor" to src.name,
                             "reason" to reason,
                             "target" to target.name)
 
-                    server.getAllMessageReceiversWithPermission("pumpkin.features.punishments.commands.pardon.view")
+                    server.getAllMessageReceiversWithPermission("pumpkin.features.punishments.commands.ban.view")
                             .filter { it != src }
                             .forEach { it.sendMessage(message) }
 

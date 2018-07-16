@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import me.tassu.features.punishments.punishment.Punishment
 import me.tassu.features.punishments.ban.PumpkinBan
+import me.tassu.features.punishments.punishment.PunishmentType
 import me.tassu.internal.db.DatabaseManager
 import me.tassu.internal.db.table.AbstractTable
 import org.spongepowered.api.util.ban.BanType
@@ -30,7 +31,7 @@ class PunishmentsTable : AbstractTable() {
                 "`revoked_on` TIMESTAMP, " +
                 "`revoked_by` VARCHAR(36), " +
                 "`revoke_reason` TEXT, " +
-                "`flags` TEXT NOT NULL);"
+                "`flags` TEXT);"
 
         private const val SELECT_VARIABLES = "id, type, target_type, target, actor, unix_timestamp(date), unix_timestamp(expires_on), " +
                 "reason, unix_timestamp(revoked_on), revoked_by, revoke_reason, flags"
@@ -42,7 +43,10 @@ class PunishmentsTable : AbstractTable() {
         private const val QUERY_EVERYTHING_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME;"
         private const val QUERY_EVERYTHING_BY_TYPE_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE target_type=?;"
 
-        private const val REVOKE_PUNISHMENT = "UPDATE %NAME SET revoked_on=CURRENT_TIMESTAMP, revoked_by=?, revoke_reason=? WHERE id=?;"
+        private const val CREATE_PERM_PUNISHMENT_SCHEMA = "INSERT INTO %NAME (type, target_type, target, actor, reason) VALUES (?, ?, ?, ?, ?);"
+        private const val CREATE_TEMP_PUNISHMENT_SCHEMA = "INSERT INTO %NAME (type, target_type, target, actor, reason, expires_on) VALUES (?, ?, ?, ?, ?, ?);"
+
+        private const val REVOKE_PUNISHMENT_SCHEMA = "UPDATE %NAME SET revoked_on=CURRENT_TIMESTAMP, revoked_by=?, revoke_reason=? WHERE id=?;"
     }
 
     private val nameReplacer = Function<String, String> {
@@ -195,7 +199,7 @@ class PunishmentsTable : AbstractTable() {
 
     fun revokePunishment(punishment: Punishment, reason: String, actor: UUID): Punishment {
         databaseManager.getConnection().use {
-            it.prepareStatement(nameReplacer.apply(REVOKE_PUNISHMENT)).use { s ->
+            it.prepareStatement(nameReplacer.apply(REVOKE_PUNISHMENT_SCHEMA)).use { s ->
                 s.setString(1, actor.toString())
                 s.setString(2, reason)
                 s.setInt(3, punishment.id)
@@ -204,6 +208,21 @@ class PunishmentsTable : AbstractTable() {
         }
 
         return queryById(punishment.id)
+    }
+
+    fun createPunishmentForUser(type: PunishmentType, target: UUID, actor: UUID, reason: String, expiresOn: Long?) {
+        databaseManager.getConnection().use {
+            it.prepareStatement(nameReplacer.apply(
+                    if (expiresOn == null) CREATE_PERM_PUNISHMENT_SCHEMA else CREATE_TEMP_PUNISHMENT_SCHEMA)).use { s ->
+                s.setString(1, type.name.toLowerCase())
+                s.setString(2, "uuid")
+                s.setString(3, target.toString())
+                s.setString(4, actor.toString())
+                s.setString(5, reason)
+                expiresOn?.let { expires -> s.setLong(6, expires) }
+                s.execute()
+            }
+        }
     }
 
 }
