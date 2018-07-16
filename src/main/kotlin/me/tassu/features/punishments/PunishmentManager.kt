@@ -1,11 +1,10 @@
 package me.tassu.features.punishments
 
 import com.google.inject.Inject
-import me.tassu.features.punishments.ban.PumpkinBan
+import me.tassu.features.punishments.punishment.Punishment
 import me.tassu.internal.db.table.tables.PunishmentsTable
 import org.spongepowered.api.util.ban.BanType
 import java.net.InetAddress
-import java.sql.ResultSet
 import java.util.*
 
 class PunishmentManager {
@@ -26,6 +25,12 @@ class PunishmentManager {
 
     fun getPunishmentsForIp(ip: InetAddress): Set<Punishment> {
         return punishmentTable.queryByTargetIp(ip)
+    }
+
+    fun revokePunishment(punishment: Punishment,
+                         reason: String = "Punishment revoked by an operator",
+                         actor: UUID = PunishmentFeature.CONSOLE_UUID): Punishment {
+        return punishmentTable.revokePunishment(punishment, reason, actor)
     }
 
 }

@@ -1,5 +1,6 @@
-package me.tassu.features.punishments
+package me.tassu.features.punishments.punishment
 
+import me.tassu.features.punishments.punishment.Punishment
 import org.spongepowered.api.util.ban.BanType
 import org.spongepowered.api.util.ban.BanTypes
 import java.lang.IllegalArgumentException
@@ -17,9 +18,16 @@ abstract class AbstractPunishment(resultSet: ResultSet) : Punishment {
         }
     }
 
-    override val targetUuid: UUID? = if (targetType == BanTypes.PROFILE) UUID.fromString(resultSet.getString("target")) else null
-    override val targetIp: InetAddress? = if (targetType == BanTypes.IP) InetAddress.getByName(resultSet.getString("target")) else null
+    final override val targetUuid: UUID? = if (targetType == BanTypes.PROFILE) UUID.fromString(resultSet.getString("target")) else null
+    final override val targetIp: InetAddress? = if (targetType == BanTypes.IP) InetAddress.getByName(resultSet.getString("target")) else null
 
+    init {
+        if (targetUuid == null && targetIp == null) {
+            throw IllegalArgumentException("FAIL: Both targetUuid and targetIp are null.")
+        }
+    }
+
+    override val id: Int = resultSet.getInt("id")
     override val actor: UUID = UUID.fromString(resultSet.getString("actor"))
     override val date: Long = resultSet.getLong("unix_timestamp(date)")
     override val expiresOn: Long? = resultSet.getLong("unix_timestamp(expires_on)")

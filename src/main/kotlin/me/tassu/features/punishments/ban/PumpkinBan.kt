@@ -1,8 +1,8 @@
 package me.tassu.features.punishments.ban
 
-import me.tassu.features.punishments.AbstractPunishment
+import me.tassu.features.punishments.punishment.AbstractPunishment
 import me.tassu.features.punishments.PunishmentFeature
-import me.tassu.features.punishments.PunishmentType
+import me.tassu.features.punishments.punishment.PunishmentType
 import me.tassu.internal.util.kt.text
 import me.tassu.internal.util.kt.toOptional
 import org.spongepowered.api.Sponge
@@ -93,6 +93,7 @@ abstract class PumpkinBan(data: ResultSet) : AbstractPunishment(data) {
 
             return builder.build() as Ban.Ip
         }
+
     }
 
     class Uuid(resultSet: ResultSet) : PumpkinBan(resultSet) {

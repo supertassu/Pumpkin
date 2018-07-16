@@ -2,7 +2,7 @@ package me.tassu.internal.db.table.tables
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import me.tassu.features.punishments.Punishment
+import me.tassu.features.punishments.punishment.Punishment
 import me.tassu.features.punishments.ban.PumpkinBan
 import me.tassu.internal.db.DatabaseManager
 import me.tassu.internal.db.table.AbstractTable
@@ -36,15 +36,13 @@ class PunishmentsTable : AbstractTable() {
                 "reason, unix_timestamp(revoked_on), revoked_by, revoke_reason, flags"
 
         private const val QUERY_BY_ID_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE id=?;"
-
         private const val QUERY_BY_TARGET_UUID_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE target=? AND target_type='uuid';"
         private const val QUERY_BY_TARGET_UUID_FROM_NAME_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE target=(SELECT uuid FROM %USER_CACHE_NAME WHERE name=?) AND target_type='uuid';"
-
         private const val QUERY_BY_TARGET_IP_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE target=? AND target_type='ip';"
-
         private const val QUERY_EVERYTHING_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME;"
-
         private const val QUERY_EVERYTHING_BY_TYPE_SCHEMA = "SELECT $SELECT_VARIABLES FROM %NAME WHERE target_type=?;"
+
+        private const val REVOKE_PUNISHMENT = "UPDATE %NAME SET revoked_on=CURRENT_TIMESTAMP, revoked_by=?, revoke_reason=? WHERE id=?;"
     }
 
     private val nameReplacer = Function<String, String> {
@@ -88,7 +86,8 @@ class PunishmentsTable : AbstractTable() {
         return getCurrentVersion()
     }
 
-    fun queryById(id: Int): Set<Punishment> {
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun queryById(id: Int): Punishment {
         return databaseManager.getConnection().use {
             return@use it.prepareStatement(nameReplacer.apply(QUERY_BY_ID_SCHEMA)).use { s ->
                 s.setInt(1, id)
@@ -101,7 +100,7 @@ class PunishmentsTable : AbstractTable() {
                 }
 
                 result.close()
-                set
+                set.first()
             }
         }
     }
@@ -192,6 +191,19 @@ class PunishmentsTable : AbstractTable() {
                 set
             }
         }
+    }
+
+    fun revokePunishment(punishment: Punishment, reason: String, actor: UUID): Punishment {
+        databaseManager.getConnection().use {
+            it.prepareStatement(nameReplacer.apply(REVOKE_PUNISHMENT)).use { s ->
+                s.setString(1, actor.toString())
+                s.setString(2, reason)
+                s.setInt(3, punishment.id)
+                s.execute()
+            }
+        }
+
+        return queryById(punishment.id)
     }
 
 }
