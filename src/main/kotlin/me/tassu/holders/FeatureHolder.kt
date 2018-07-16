@@ -1,4 +1,4 @@
-package me.tassu.internal.feature
+package me.tassu.holders
 
 import com.google.inject.Inject
 import com.google.inject.Singleton

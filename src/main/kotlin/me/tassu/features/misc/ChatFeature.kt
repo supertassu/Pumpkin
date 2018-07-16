@@ -45,7 +45,8 @@ class ChatFeature : SimpleFeature() {
                 "user_prefix" to prefix,
                 "user_suffix" to suffix,
                 "user_name" to player.name,
-                "text" to rawMessage.replace("&", "&\\")))
+                "text" to rawMessage.replace("&",
+                        if (player.hasPermission("pumpkin.feature.chat.color")) "&" else "")))
     }
 
     override val listeners: List<Any> = listOf()

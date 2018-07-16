@@ -46,3 +46,9 @@ fun CommandSource.sendMessage(color: Boolean = true, input: String, vararg place
 fun CommandSource.sendColoredMessage(input: String, vararg placeholders: Pair<String, Any>) {
     this.sendMessage(input.formatColoredMessage(*placeholders))
 }
+
+fun CommandSource.sendColoredMessages(input: List<String>, vararg placeholders: Pair<String, Any>) {
+    input.forEach {
+        sendColoredMessage(it, *placeholders)
+    }
+}

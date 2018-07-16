@@ -117,35 +117,91 @@ class GeneralMessages {
 
     @ConfigSerializable
     class CommandMessages {
-        @Setting("no permissions")
-        var noPerms = "&7You do not have the required permission (&2{{perm}}&7) to execute this command."
+        @Setting
+        var meta = Meta()
+
+        @ConfigSerializable
+        class Meta {
+            @Setting("no permissions")
+            var noPerms = "&7You do not have the required permission (&2{{perm}}&7) to execute this command."
+
+            @Setting
+            var usage = "&7This command is used like &2{{usage}}"
+
+            @Setting
+            var error = "NOPREFIX|&4(Pumpkin) &cThe following error happened whilst executing the command: &4{{error}}"
+        }
 
         @Setting
-        var usage = "&7This command is used like &2{{usage}}"
-
-        @Setting
-        var args = "&7The value &2{{given}}&7 can not be converted to a &2{{expected}}&7."
-
-        @Setting
-        var error = "NOPREFIX|&4(Pumpkin) &cThe following error happened whilst executing the command: &4{{error}}"
-
-        @Setting
-        val gamemode = GameMode()
+        var gamemode = GameMode()
 
         @ConfigSerializable
         class GameMode {
             @Setting("msg self own")
             var setOwn = "&7Your game mode was set to &2{{mode}}&7."
 
-            @Setting("msg set other")
+            @Setting("msg self other")
             var setOther = "&7Game mode of &2{{target}}&7 was set to &2{{mode}}&7."
 
             @Setting("msg others own")
-            var otherSetOwn = "&2{{actor}} set own game mode to &2{{mode}}&7."
+            var otherSetOwn = "&2{{actor}}&7 set own game mode to &2{{mode}}&7."
 
             @Setting("msg others other")
             var otherSetOther = "&2{{actor}}&7 set game mode of &2{{target}}&7 to &2{{mode}}&7."
         }
+
+        @Setting
+        var teleport = Teleport()
+
+        @ConfigSerializable
+        class Teleport {
+            @Setting("msg self self")
+            var teleportSelf = "&7Teleported to &2{{target}}&7."
+
+            @Setting("msg self other")
+            var teleportOther = "&7Teleported &2{{player}}&7 to &2{{target}}&7."
+
+            @Setting("msg other self")
+            var otherTeleportSelf = "&2{{actor}}&7 teleported themselves to &2{{target}}&7."
+
+            @Setting("msg other other")
+            var otherTeleportOther = "&2{{actor}}&7 teleported &2{{player}}&7 to &2{{target}}&7."
+        }
+
+        @Setting
+        val fly = Fly()
+
+        @ConfigSerializable
+        class Fly {
+            @Setting("msg self own")
+            var setOwn = "&7Your flight mode was set to &2{{mode}}&7."
+
+            @Setting("msg self other")
+            var setOther = "&7Flight mode of &2{{target}}&7 was set to &2{{mode}}&7."
+
+            @Setting("msg others own")
+            var otherSetOwn = "&2{{actor}}&7 set own flight mode to &2{{mode}}&7."
+
+            @Setting("msg others other")
+            var otherSetOther = "&2{{actor}}&7 set flight mode of &2{{target}}&7 to &2{{mode}}&7."
+        }
+
+        @Setting
+        var pumpkin = Pumpkin()
+
+        @ConfigSerializable
+        class Pumpkin {
+            @Setting
+            var fallback = listOf(
+                    "NOPREFIX| &aPUMPKIN &aver. {{version}}",
+                    "NOPREFIX| &7* &aEnabled modules: &7{{enabled modules}}",
+                    "NOPREFIX| &7* &aDisabled modules: &7{{disabled modules}}"
+            )
+
+            @Setting
+            var reloaded = "Successfully reloaded. See console for more details."
+        }
+
     }
 
 }

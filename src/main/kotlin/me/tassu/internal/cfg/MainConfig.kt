@@ -72,11 +72,8 @@ class MainConfig {
     @Setting(comment = "Enables / Disables Debug mode.")
     var debug = true
 
-    @Setting("enabled commands", comment = "Sponge's nature allows enabling / disabling commands on the fly.\nThis array contains all enabled commands.")
-    var enabledCommands = listOf("gamemode")
-
-    @Setting("enabled features", comment = "This array contains all enabled features.")
-    var enabledFeatures = listOf("chat", "punishments")
+    @Setting("enabled features", comment = "This array contains all enabled modules and commands.")
+    var enabledFeatures = listOf("chat", "punishments", "cmd_gamemode", "cmd_teleport", "cmd_pumpkin")
 
     @Setting(comment = "Contains database configuration.")
     var database = DatabaseConfig()
@@ -97,7 +94,7 @@ class MainConfig {
         var username = "bart"
 
         @Setting
-        var password = "please_create_a_better_password_than_this"
+        var password = "simpsn"
 
         @Setting
         var database = "minecraft"

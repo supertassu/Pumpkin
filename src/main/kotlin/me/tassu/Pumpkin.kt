@@ -7,9 +7,10 @@ import me.tassu.internal.api.prefix.LuckPermsPrefixProvider
 import me.tassu.internal.api.prefix.PrefixProvider
 import me.tassu.internal.cfg.GeneralMessages
 import me.tassu.internal.cfg.MainConfig
-import me.tassu.internal.cmds.meta.CommandHolder
+import me.tassu.holders.CommandHolder
 import me.tassu.internal.db.DatabaseManager
-import me.tassu.internal.feature.FeatureHolder
+import me.tassu.internal.di.PumpkinHolder
+import me.tassu.holders.FeatureHolder
 import me.tassu.internal.util.CacheClearer
 import me.tassu.internal.util.PumpkinLog
 import me.tassu.internal.util.kt.text
@@ -34,6 +35,12 @@ import java.util.concurrent.TimeUnit
 @Singleton
 class Pumpkin {
 
+    companion object {
+        @JvmName("getInstance") fun getInstance(): Pumpkin {
+            return PumpkinHolder.getInstance().injector.getInstance(Pumpkin::class.java)
+        }
+    }
+
     @Inject private lateinit var game: Game
     @Inject private lateinit var log: PumpkinLog
     @Inject private lateinit var container: PluginContainer
@@ -51,21 +58,27 @@ class Pumpkin {
     @Inject private lateinit var cacheCleaner: CacheClearer
 
     private val injector: Injector by lazy {
-        PumpkinLoader.injector
+        PumpkinHolder.getInstance().injector
     }
 
     val features by lazy {
         return@lazy mapOf(
                 "chat" to featureHolder.chat,
                 "punishments" to featureHolder.punishment,
-                "user_data" to featureHolder.userData
+                "user_data" to featureHolder.userData,
+
+                // commands
+                "cmd_gamemode" to commands.gameModeCommand,
+                "cmd_teleport" to commands.teleportCommand,
+                "cmd_pumpkin" to commands.pumpkinCommand,
+                "cmd_fly" to commands.flightCommand
         )
     }
 
-    @get:JvmName("isDebugEnabled") var debug: Boolean = true
+    @get:JvmName("isDebuggingEnabled") var debug: Boolean = true
 
     @get:JvmName("getVersion")
-    private val version: String get() = PumpkinLoader::class.java.annotations
+    val version: String get() = PumpkinLoader::class.java.annotations
             .filterIsInstance(Plugin::class.java)
             .first()
             .version
@@ -131,10 +144,13 @@ class Pumpkin {
             it.permissions.forEach { perm ->
                 val builder = permissionService.newDescriptionBuilder(instance)
 
-                builder.id("pumpkin.feature.${it.id}.$perm")
+                builder.id("pumpkin.${it.permissionPrefix}.$perm")
                         .description("Permission registered by feature ${it.id}".text())
                         .assign(PermissionDescription.ROLE_STAFF, true)
                         .register()
+
+                log.debug("Registered permission \"pumpkin.${it.permissionPrefix}.$perm\".",
+                        "Pumpkin#serverStarting()")
             }
         }
 
@@ -145,7 +161,7 @@ class Pumpkin {
 
     @Listener
     @Suppress("UNUSED_PARAMETER")
-    fun reload(event: GameReloadEvent) {
+    fun reload(event: GameReloadEvent?) {
         val timer = System.currentTimeMillis()
         log.info("§aReloading Pumpkin...")
         reloadConfig()
@@ -169,32 +185,11 @@ class Pumpkin {
         debug = mainConfig.debug
         log.info("New state for debug is $debug")
 
-        // Register new commands
-        log.info("Registering commands, this might take a while.")
-        log.info("-> Unregistering old commands")
+        // Remove old commands
+        log.info("Unregistering old commands")
         Sponge.getCommandManager().getOwnedBy(container).forEach {
             Sponge.getCommandManager().removeMapping(it)
         }
-
-        log.info("-> Loading commands from configuration file.")
-        val enabledCommands = mainConfig.enabledCommands.map { it.toLowerCase() }.toMutableList()
-        log.info("--> Found ${enabledCommands.size} commands.")
-
-        while (enabledCommands.isNotEmpty()) {
-            val it = enabledCommands.removeAt(0)
-            when (it) {
-                "gamemode" -> commands.gameModeCommand.register(container)
-                else -> {
-                    log.warn("*** Unknown command: $it")
-                }
-            }
-        }
-
-        if (enabledCommands.isNotEmpty()) {
-            log.warn("** Found ${enabledCommands.size} unknown commands: ${enabledCommands.joinToString()}")
-        }
-
-        log.info("-> All commands registered.")
 
         log.info("Reloading features")
 
