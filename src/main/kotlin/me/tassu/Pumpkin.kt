@@ -139,7 +139,11 @@ class Pumpkin {
 
         features.forEach { _, it ->
             Sponge.getEventManager().registerListeners(instance, it)
-            it.listeners.forEach { listener -> Sponge.getEventManager().registerListeners(instance, listener) }
+            it.listeners.forEach { listener ->
+                log.debug("Registered listener \"${listener::javaClass.get().name}\" for ${it.id}.",
+                        "Pumpkin#serverStarting()")
+                Sponge.getEventManager().registerListeners(instance, listener)
+            }
 
             it.permissions.forEach { perm ->
                 val builder = permissionService.newDescriptionBuilder(instance)
