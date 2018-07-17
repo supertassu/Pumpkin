@@ -14,70 +14,45 @@ import org.spongepowered.api.command.args.CommandElement
 import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.util.Tristate
 
 @Singleton
-class FlyCommand : AbstractCommand("Fly", "fly", "f", "flight") {
+class HealCommand : AbstractCommand("Heal", "heal", "hp") {
 
     override fun executeCommand(src: CommandSource, args: CommandContext): CommandResult {
         val rawPlayer = args.getOne<PossibleContainer<Player>>("player")
-        var rawMode = args.getOne<PossibleContainer<Tristate>>("mode")
-
-        if (!rawMode.isPresent) {
-            rawMode = PossibleContainer(Tristate.UNDEFINED).toOptional()
-        }
 
         if (!rawPlayer.isPresent && src !is Player) {
-            throw InvalidUsageException("/fly [status] [player]")
+            throw InvalidUsageException("/fly [player]")
         }
 
         val player = if (rawPlayer.isPresent) rawPlayer.get() else PossibleContainer(src as Player)
 
         if (!player.isPresent()) {
-            throw InvalidUsageException("/fly [status] [player]")
+            throw InvalidUsageException("/fly [status]")
         }
 
-        val mode = when (rawMode.get().get()) {
-            Tristate.TRUE -> true
-            Tristate.FALSE -> false
-            else -> {
-                val value = player.get()!!.getValue(Keys.CAN_FLY)
-                if (value.isPresent) !value.get().get() else true
-            }
-        }.toOptional()
-
-        if (!mode.isPresent) {
-            throw InvalidUsageException("/fly [status] [player]")
-        }
-
-        player.get()!!.offer(Keys.CAN_FLY, mode.get())
-        player.get()!!.offer(Keys.IS_FLYING, mode.get())
-
-        val new = mode.get()
+        player.get()!!.offer(Keys.HEALTH, player.get()!!.get(Keys.MAX_HEALTH).get())
+        player.get()!!.offer(Keys.FIRE_TICKS, 0)
 
         if (src is Player && src.uniqueId == player.get()!!.uniqueId) {
-            src.sendColoredMessage(generalMessages.commands.fly.setOwn,
-                    "mode" to new)
+            src.sendColoredMessage(generalMessages.commands.heal.healSelf)
 
-            val message = generalMessages.commands.fly.otherSetOwn.formatColoredMessage(
-                    "actor" to src.name,
-                    "mode" to new,
-                    "target" to player.get()!!.name)
+            val message = generalMessages.commands.heal.otherHealSelf.formatColoredMessage(
+                    "actor" to src.name)
 
-            server.getAllMessageReceiversWithPermission("pumpkin.command.fly.view")
+            server.getAllMessageReceiversWithPermission("pumpkin.command.heal.view")
                     .filter { it != src }
                     .forEach { it.sendMessage(message) }
 
         } else {
-            src.sendColoredMessage(generalMessages.commands.fly.setOther,
-                    "mode" to new, "target" to player.get()!!.name)
-
-            val message = generalMessages.commands.fly.otherSetOther.formatColoredMessage(
-                    "actor" to src.name,
-                    "mode" to new,
+            src.sendColoredMessage(generalMessages.commands.heal.healOther,
                     "target" to player.get()!!.name)
 
-            server.getAllMessageReceiversWithPermission("pumpkin.command.fly.view")
+            val message = generalMessages.commands.heal.otherHealOther.formatColoredMessage(
+                    "actor" to src.name,
+                    "target" to player.get()!!.name)
+
+            server.getAllMessageReceiversWithPermission("pumpkin.command.heal.view")
                     .filter { it != src }
                     .forEach { it.sendMessage(message) }
         }
@@ -86,7 +61,6 @@ class FlyCommand : AbstractCommand("Fly", "fly", "f", "flight") {
     }
 
     override val arguments: Array<CommandElement> = arrayOf(
-            GenericArguments.onlyOne(GenericArguments.optional(TriStateCompletion("mode"))),
             GenericArguments.onlyOne(GenericArguments.optional(PlayerCompletion("player", true)))
     )
 

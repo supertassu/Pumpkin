@@ -187,6 +187,42 @@ class GeneralMessages {
         }
 
         @Setting
+        val heal = Heal()
+
+        @ConfigSerializable
+        class Heal {
+            @Setting("msg self own")
+            var healSelf = "&7You healed yourself&7."
+
+            @Setting("msg self other")
+            var healOther = "&7You healed &2{{target}}&7."
+
+            @Setting("msg others own")
+            var otherHealSelf = "&2{{actor}}&7 healed themselves."
+
+            @Setting("msg others other")
+            var otherHealOther = "&2{{actor}}&7 healed &2{{target}}&7."
+        }
+
+        @Setting
+        val feed = Feed()
+
+        @ConfigSerializable
+        class Feed {
+            @Setting("msg self own")
+            var fedSelf = "&7You fed yourself&7."
+
+            @Setting("msg self other")
+            var fedOther = "&7You fed &2{{target}}&7."
+
+            @Setting("msg others own")
+            var otherFedSelf = "&2{{actor}}&7 fed themselves."
+
+            @Setting("msg others other")
+            var otherFedOther = "&2{{actor}}&7 fed &2{{target}}&7."
+        }
+
+        @Setting
         var pumpkin = Pumpkin()
 
         @ConfigSerializable

@@ -2,6 +2,7 @@ package me.tassu.features.punishments.listener
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import me.tassu.features.punishments.PunishmentFeature
 import me.tassu.features.punishments.PunishmentManager
 import me.tassu.features.punishments.ban.PumpkinBan
 import me.tassu.features.punishments.punishment.PunishmentType
@@ -18,11 +19,14 @@ import org.spongepowered.api.util.Tristate
 class ConnectListener {
 
     @Inject private lateinit var manager: PunishmentManager
+    @Inject private lateinit var feature: PunishmentFeature
     @Inject private lateinit var generalMessages: GeneralMessages
 
     @Listener(beforeModifications = true, order = Order.FIRST)
     @IsCancelled(Tristate.UNDEFINED)
     fun onConnect(event: ClientConnectionEvent.Login) {
+        if (!feature.isEnabled) return
+
         val ban = manager
                 .getPunishmentsForUser(event.profile.uniqueId)
                 .filter { it.type == PunishmentType.BAN }

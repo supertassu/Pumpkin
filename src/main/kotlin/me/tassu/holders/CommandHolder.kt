@@ -2,10 +2,7 @@ package me.tassu.holders
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import me.tassu.cmds.FlyCommand
-import me.tassu.cmds.GamemodeCommand
-import me.tassu.cmds.PumpkinCommand
-import me.tassu.cmds.TeleportCommand
+import me.tassu.cmds.*
 
 @Singleton
 class CommandHolder {
@@ -14,5 +11,7 @@ class CommandHolder {
     @Inject lateinit var teleportCommand: TeleportCommand
     @Inject lateinit var pumpkinCommand: PumpkinCommand
     @Inject lateinit var flightCommand: FlyCommand
+    @Inject lateinit var healCommand: HealCommand
+    @Inject lateinit var feedCommand: FeedCommand
 
 }

@@ -66,12 +66,15 @@ class Pumpkin {
                 "chat" to featureHolder.chat,
                 "punishments" to featureHolder.punishment,
                 "user_data" to featureHolder.userData,
+                "disable_join_messages" to featureHolder.disableJoinMessages,
 
                 // commands
                 "cmd_gamemode" to commands.gameModeCommand,
                 "cmd_teleport" to commands.teleportCommand,
                 "cmd_pumpkin" to commands.pumpkinCommand,
-                "cmd_fly" to commands.flightCommand
+                "cmd_fly" to commands.flightCommand,
+                "cmd_heal" to commands.healCommand,
+                "cmd_feed" to commands.feedCommand
         )
     }
 

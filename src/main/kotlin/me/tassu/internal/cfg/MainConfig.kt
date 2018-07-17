@@ -73,7 +73,8 @@ class MainConfig {
     var debug = true
 
     @Setting("enabled features", comment = "This array contains all enabled modules and commands.")
-    var enabledFeatures = listOf("chat", "punishments", "cmd_gamemode", "cmd_teleport", "cmd_pumpkin")
+    var enabledFeatures = listOf("chat", "punishments",
+            "cmd_gamemode", "cmd_teleport", "cmd_pumpkin", "cmd_fly", "cmd_heal", "cmd_feed")
 
     @Setting(comment = "Contains database configuration.")
     var database = DatabaseConfig()
